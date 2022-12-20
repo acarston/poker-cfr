@@ -6,7 +6,7 @@ using namespace std;
 
 class Node {
     public:
-        const int NUM_ACTIONS = 2;
+        const int NUM_ACTIONS = 2; //should this be public?
         vector<double> cumulativeRegrets = {0.0, 0.0};
 
         vector<double> GetCurrentStrategy(double reachProbability);

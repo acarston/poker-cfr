@@ -1,13 +1,22 @@
 #include "KuhnCfrBot.h"
 
-double KuhnCfrBot::Cfr(vector<int> cards, string history = "", vector<double> reachProbabilities = {1.0, 1.0}) {
+KuhnCfrBot::KuhnCfrBot() {
+    //this->terminalHistories = terminalHistories;
+    terminalHistories["bb"] = NULL;
+    terminalHistories["bp"] = NULL;
+    terminalHistories["pp"] = NULL;
+};
+
+double KuhnCfrBot::Cfr(vector<int> cards, string history, vector<double> reachProbabilities) {
     int currentPlayer = (history.size() % 2 == 0) ? PLAYER_1 : PLAYER_2;
 
     int terminalHistoryStart = history.size() - 2;
     string terminalHistory = history.substr(terminalHistoryStart, TERMINAL_HISTORY_LENGTH);
 };
 
-bool KuhnCfrBot::IsTerminal(string history) {
+bool KuhnCfrBot::IsTerminal(string terminalHistory) {
+    //FIXME: if history in terminalHistories hashmap, return true
+    return (terminalHistories.find(terminalHistory) != terminalHistories.end());
 };
 
 int KuhnCfrBot::GetTerminalPayoff(vector<int> cards, string terminalHistory, int currentPlayer) {
