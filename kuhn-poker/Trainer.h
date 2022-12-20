@@ -9,7 +9,7 @@ using namespace std;
 class Trainer {
     public:
         void Train();
-        void DisplayNodeStrategies(); //retrieves hashmap and prints values
+        void DisplayNodeStrategies(); //retrieves hashmap and prints valuess
     private:
         KuhnCfrBot bot;
         vector<int> deck = {0, 1, 2};
