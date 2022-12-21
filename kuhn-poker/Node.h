@@ -6,13 +6,13 @@ using namespace std;
 
 class Node {
     public:
-        const int NUM_ACTIONS = 2; //should this be public?
         vector<double> cumulativeRegrets = {0.0, 0.0};
 
         vector<double> GetCurrentStrategy(double reachProbability);
         vector<double> GetAverageStrategy(); 
     private:
         vector<double> sumOfStrategies = {0.0, 0.0};
+        const int NUM_ACTIONS = 2;
 
         vector<double> NormalizeVector(vector<double> vector);
 };

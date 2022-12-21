@@ -21,7 +21,6 @@ vector<double> Node::GetAverageStrategy() {
 
 vector<double> Node::NormalizeVector(vector<double> vector) {
     double vectorSum = 0.0;
-
     for (unsigned int i = 0; i < vector.size(); ++i) vectorSum += vector.at(i);
 
     if (vectorSum > 0) {
