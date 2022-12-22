@@ -1,0 +1,53 @@
+[33mcommit 46f4d6fffc23863a3e385456f693fa39543e249c[m[33m ([m[1;36mHEAD -> [m[1;32merror[m[33m, [m[1;31morigin/error[m[33m)[m
+Author: acarston <amcarston@gmail.com>
+Date:   Wed Dec 21 17:51:19 2022 -0700
+
+    Test.exe does not exist
+
+[33mcommit 54324965216782af8bcd477de3daf3de83005033[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m
+Author: acarston <amcarston@gmail.com>
+Date:   Wed Dec 21 00:25:26 2022 -0700
+
+    debug KuhnCfrBot class
+
+[33mcommit 18a5b134284a6e5068c6b9680e4e7680d1bb5c15[m
+Author: acarston <amcarston@gmail.com>
+Date:   Tue Dec 20 20:35:14 2022 -0700
+
+    write the CFR method
+
+[33mcommit 21d1d9df079c513bc94503bf8aa809e640c34c3e[m
+Author: acarston <amcarston@gmail.com>
+Date:   Tue Dec 20 14:26:03 2022 -0700
+
+    remove unnecessary functions and consolidate code
+
+[33mcommit 6be1bf43bf123119292a31442cc25450814c6154[m
+Author: acarston <amcarston@gmail.com>
+Date:   Mon Dec 19 23:22:12 2022 -0700
+
+    Fix redeclaration error
+
+[33mcommit 0b757a60167939b7672f9477fee4a6bef9c31f7b[m
+Author: acarston <amcarston@gmail.com>
+Date:   Mon Dec 19 22:59:04 2022 -0700
+
+    test commit
+
+[33mcommit be164bc2bbe9c64b14666f8f24e138e638770b26[m
+Author: acarston <amcarston@gmail.com>
+Date:   Mon Dec 19 21:56:02 2022 -0700
+
+    Add vscode files; write GetTerminalPayoff method
+
+[33mcommit 93c7f5b7e95d2e6444c68d78c3231d890b49b279[m
+Author: acarston <amcarston@gmail.com>
+Date:   Sun Dec 18 20:05:13 2022 -0700
+
+    Change file name
+
+[33mcommit b70d87467f9bd7f088ed01f04361ed1ecc809e4c[m
+Author: acarston <amcarston@gmail.com>
+Date:   Sun Dec 18 19:39:46 2022 -0700
+
+    Initial commit. Create kuhn-poker project skeleton, write Node class and write shuffle method

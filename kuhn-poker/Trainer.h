@@ -4,14 +4,14 @@
 #include <vector>
 using namespace std;
 
-#include "KuhnCfrBot.cpp"
+#include "KuhnCFR.h"
 
 class Trainer {
     public:
         void Train();
         void DisplayNodeStrategies(); //retrieves hashmap and prints valuess
     private:
-        KuhnCfrBot bot;
+        KuhnCFR bot;
         vector<int> deck = {0, 1, 2};
         vector<int> currentDeal = {0, 1};
 
