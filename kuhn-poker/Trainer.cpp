@@ -1,9 +1,19 @@
 #include <random>
-using namespace std;
+#include <iostream>
 
 #include "Trainer.h"
 
+//TODO: Merge Trainer and KuhnCfrBot classes? ADD COMMENTS PLEASE
 void Trainer::Train() {
+    cout << "How many iterations?" << endl;
+    cin >> numIterations;
+
+    KuhnCFR bot;
+    double rootNodeUtility = 0.0;
+    for (unsigned int i = 0; i < numIterations; ++i) {
+        Shuffle(currentDeal);
+        rootNodeUtility += bot.CalculateUtilities(currentDeal);
+    }
 };
 
 void Trainer::DisplayNodeStrategies() {

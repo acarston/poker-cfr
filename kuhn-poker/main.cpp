@@ -26,6 +26,5 @@ void testCfr() {
 
 int main() {
     //testCfr();
-    cout << "tese" << endl;
     return 0;
 };

@@ -12,7 +12,7 @@ class Node {
         vector<double> GetAverageStrategy(); 
     private:
         vector<double> sumOfStrategies = {0.0, 0.0};
-        const int NUM_ACTIONS = 2;
+        const int NUM_ACTIONS = cumulativeRegrets.size();
 
         vector<double> NormalizeVector(vector<double> vector);
 };
