@@ -1,6 +1,6 @@
 #include "Node.h"
 
-//Normalizes positive regrets and updates strategy sum
+/* normalize positive regrets and update strategy sum */
 vector<double> Node::GetCurrentStrategy(double reachProbablilty) {
     vector<double> strategy(cumulativeRegrets.size(), 0.0); 
 
@@ -26,7 +26,7 @@ vector<double> Node::NormalizeVector(vector<double> vector) {
     if (vectorSum > 0) {
         for (unsigned int i = 0; i < vector.size(); ++i) vector.at(i) /= vectorSum;
     }
-    else { //default case gives an even probability distribution
+    else {  //default case (give an even distribution)
         for (unsigned int i = 0; i < vector.size(); ++i) vector.at(i) = 1.0 / NUM_ACTIONS;
     }
 
