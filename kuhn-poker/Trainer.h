@@ -9,12 +9,13 @@ using namespace std;
 class Trainer {
     public:
         void Train();
-        void DisplayNodeStrategies(); //retrieves hashmap and prints valuess
+        void DisplayNodeStrategies();
     private:
         KuhnCFR bot;
-        vector<int> deck = {0, 1, 2};
-        vector<int> currentDeal = {0, 1};
+
         int numIterations = 0;
+        double rootNodeUtility = 0.0;
+        vector<int> currentDeal = {0, 1};
 
         void Shuffle(vector<int>& currentDeal);
 };
