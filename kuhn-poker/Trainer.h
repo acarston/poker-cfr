@@ -4,7 +4,7 @@
 #include <vector>
 using namespace std;
 
-#include "KuhnCFR.h"
+#include "KuhnCFR.cpp"
 
 class Trainer {
     public:

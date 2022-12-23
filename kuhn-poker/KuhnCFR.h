@@ -5,7 +5,7 @@
 #include <string>
 using namespace std;
 
-#include "Node.h"
+#include "Node.cpp"
 
 class KuhnCFR {
     public:
