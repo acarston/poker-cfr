@@ -3,18 +3,15 @@
 
 #include "Trainer.h"
 
-void Trainer::Train() {
-    cout << "How many iterations?" << endl;
-    cin >> numIterations;
-
+void Trainer::Train(int numIterations) {
     for (unsigned int i = 0; i < numIterations; ++i) {
         Shuffle(currentDeal);
         rootNodeUtility += bot.CalculateUtilities(currentDeal);
     }
 };
 
-void Trainer::DisplayNodeStrategies() {
-    cout << "Utility of the root node: " << rootNodeUtility << "\n\n";
+void Trainer::DisplayNodeStrategies(int numIterations) {
+    cout << "Utility of the root node:\n" << rootNodeUtility << "\n\n";
     cout << "Node Strategies:\n";
 
     unordered_map<string, Node>::iterator it;
@@ -25,7 +22,7 @@ void Trainer::DisplayNodeStrategies() {
         cout << it->first << ": ";
         cout << "bet " << strategy.at(0) << ", pass " << strategy.at(1) << "\n";
     }
-    cout << endl;
+    cout << "\n\nThis program was trained for " << numIterations << " iterations." << endl;
 };
 
 /* shuffle deck and deal from top */

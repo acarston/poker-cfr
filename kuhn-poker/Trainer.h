@@ -8,12 +8,11 @@ using namespace std;
 
 class Trainer {
     public:
-        void Train();
-        void DisplayNodeStrategies();
+        void Train(int numIterations);
+        void DisplayNodeStrategies(int numIterations);
     private:
         KuhnCFR bot;
 
-        int numIterations = 0;
         double rootNodeUtility = 0.0;
         vector<int> currentDeal = {0, 1};
 
