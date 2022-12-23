@@ -11,13 +11,14 @@ void Trainer::Train(int numIterations) {
 };
 
 void Trainer::DisplayNodeStrategies(int numIterations) {
-    cout << "Utility of the root node:\n" << rootNodeUtility << "\n\n";
+    cout << "Average utility of the root node:\n" << (rootNodeUtility / numIterations) << "\n\n";
     cout << "Node Strategies:\n";
 
     unordered_map<string, Node>::iterator it;
     vector<double> strategy(currentDeal.size(), 0.0);
 
     for (it = bot.nodes.begin(); it != bot.nodes.end(); ++it) {
+        if (it->first.size() < 2) continue;
         strategy = it->second.GetAverageStrategy();
         cout << it->first << ": ";
         cout << "bet " << strategy.at(0) << ", pass " << strategy.at(1) << "\n";
