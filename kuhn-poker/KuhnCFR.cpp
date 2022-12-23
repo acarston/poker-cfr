@@ -1,9 +1,10 @@
 #include "KuhnCFR.h"
 
 double KuhnCFR::CalculateUtilities(vector<int> cards, string history, vector<double> reachProbabilities) {
-    currentPlayer = (history.size() % 2 == 0) ? PLAYER_1 : PLAYER_2;
+    double nodeUtility = 0.0;
+    int currentPlayer = (history.size() % 2 == 0) ? PLAYER_1 : PLAYER_2;
 
-    if (history.size() > 1) nodeUtility = GetTerminalUtility(history, cards);
+    if (history.size() > 1) nodeUtility = GetTerminalUtility(history, cards, nodeUtility, currentPlayer);
     if (nodeUtility != 0.0) return nodeUtility;
 
     string key = to_string(cards.at(currentPlayer)) + history;
@@ -28,7 +29,7 @@ double KuhnCFR::CalculateUtilities(vector<int> cards, string history, vector<dou
     return nodeUtility;
 };
 
-double KuhnCFR::GetTerminalUtility(string history, vector<int> cards) {
+double KuhnCFR::GetTerminalUtility(string history, vector<int> cards, double nodeUtility, int currentPlayer) {
     int terminalHistoryStart = history.size() - TERMINAL_HISTORY_LENGTH;
     string terminalHistory = history.substr(terminalHistoryStart, TERMINAL_HISTORY_LENGTH);
 

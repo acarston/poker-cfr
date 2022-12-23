@@ -1,12 +1,20 @@
-#include "Node.h"
-#include "Trainer.h"
-#include "KuhnCFR.h"
+#include "Node.cpp"
+#include "Trainer.cpp"
+#include "KuhnCFR.cpp"
 
 #include <assert.h>
 #include <iostream>
 
 void testCfr() {
     KuhnCFR bot;
+    // Test 1: Check that the function returns the correct utility for a terminal state
+    vector<int> cards1 = {1, 0};
+    string history1 = "pp";
+    vector<double> reachProbabilities1 = {1.0, 1.0};
+    double expectedUtility1 = 1;
+    double actualUtility1 = bot.CalculateUtilities(cards1, history1, reachProbabilities1);
+    assert(expectedUtility1 == actualUtility1);
+
     // Test 2: Check that the function returns the correct utility for a non-terminal state
     vector<int> cards2 = {1, 2};
     string history2 = "pb";
@@ -25,6 +33,6 @@ void testCfr() {
 
 
 int main() {
-    //testCfr();
+    testCfr();
     return 0;
 };
