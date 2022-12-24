@@ -12,20 +12,21 @@ double KuhnCFR::CalculateUtilities(vector<int> cards, string history, vector<dou
     string key = to_string(cards.at(currentPlayer)) + history;
     Node& currentNode = GetNode(key);
 
-    // compute current game-state and counterfactual utilities for each node in the game tree
-    vector<double> nextReachProbabilities = reachProbabilities;
-    vector<double> counterfactualUtilities(NUM_ACTIONS, 0.0);
+    // compute current game-state and counterfactual utilities for current and reachable nodes
+    vector<double> nextReachProbabilities(NUM_ACTIONS, 0.0), counterfactualUtilities(NUM_ACTIONS, 0.0);
     vector<double> nodeStrategy = currentNode.GetCurrentStrategy(reachProbabilities.at(currentPlayer));
 
     for (unsigned int i = 0; i < NUM_ACTIONS; ++i) {
+        nextReachProbabilities = reachProbabilities;
         nextReachProbabilities.at(currentPlayer) = reachProbabilities.at(currentPlayer) * nodeStrategy.at(i); 
         counterfactualUtilities.at(i) = -CalculateUtilities(cards, (history + ACTIONS.at(i)), nextReachProbabilities);
-        nodeUtility += counterfactualUtilities.at(i) * nextReachProbabilities.at(currentPlayer);
+        nodeUtility += counterfactualUtilities.at(i) * nodeStrategy.at(i);
     }
 
-    // update the node's cumulative regrets
+    // add positive regrets to node's cumulative regrets
     int opponent = !bool(currentPlayer);
     for (unsigned int i = 0; i < counterfactualUtilities.size(); ++i) {
+        if (nodeUtility > counterfactualUtilities.at(i)) continue;
         currentNode.cumulativeRegrets.at(i) += counterfactualUtilities.at(i) - nodeUtility;
         currentNode.cumulativeRegrets.at(i) *= reachProbabilities.at(opponent);
     }
