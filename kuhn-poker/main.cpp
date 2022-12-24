@@ -15,6 +15,8 @@ int main() {
     //It's like he knows the game state instead of the information set
     //TODO: test {0, x}, {1, 0} to confirm theory
 
+    //Ideas: maybe my chance sampling has something to do with it? since p1 never actually does have jack?
+
     Trainer trainer;
     int numIterations = 100000;
 
