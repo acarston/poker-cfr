@@ -14,10 +14,10 @@ class Trainer {
         KuhnCFR bot;
 
         double rootNodeUtility = 0.0;
-        vector<int> deck;
-        vector<int> currentDeal = {0, 1};
+        vector<int> deck = {};
 
-        void SetDeck(vector<int>& deck);
+        vector<vector<int>> GetDealPermutations(vector<int> deck);
+        void SetDeckSize(vector<int>& deck, int size);
         void Shuffle(vector<int>& currentDeal);
 };
 

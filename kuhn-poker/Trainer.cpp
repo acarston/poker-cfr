@@ -4,9 +4,13 @@
 #include "Trainer.h"
 
 void Trainer::Train(int numIterations) {
+    SetDeckSize(deck, 3);
+    vector<vector<int>> dealPermutations = GetDealPermutations(deck);
+
     for (unsigned int i = 0; i < numIterations; ++i) {
-        Shuffle(currentDeal);
-        rootNodeUtility += bot.CalculateUtilities(currentDeal);
+        for (vector<int> permutation : dealPermutations) {
+            rootNodeUtility += bot.CalculateUtilities(permutation);
+        }
     }
 };
 
@@ -15,7 +19,7 @@ void Trainer::DisplayNodeStrategies(int numIterations) {
     cout << "Node Strategies:\n";
 
     unordered_map<string, Node>::iterator it;
-    vector<double> strategy(currentDeal.size(), 0.0);
+    vector<double> strategy(2, 0.0);
 
     for (it = bot.nodes.begin(); it != bot.nodes.end(); ++it) {
         if (it->first.size() < 2) continue;
@@ -24,6 +28,24 @@ void Trainer::DisplayNodeStrategies(int numIterations) {
         cout << "bet " << strategy.at(0) << ", pass " << strategy.at(1) << "\n";
     }
     cout << "\n\nThis program was trained for " << numIterations << " iterations." << endl;
+};
+
+vector<vector<int>> Trainer::GetDealPermutations(vector<int> deck) {
+    const int FIRST_CARD = 0, CARD_INCREMENT = 1;
+    vector<vector<int>> dealPermutations = {};
+
+    for (int i = deck.at(FIRST_CARD); i < deck.size() - CARD_INCREMENT; ++i) {
+        for (int j = i + CARD_INCREMENT; j < deck.size(); ++j) {
+            dealPermutations.push_back({i, j});
+        }
+    }
+    for (int i = deck.size() - CARD_INCREMENT; i > FIRST_CARD; --i) {
+        for (int j = i - CARD_INCREMENT; j > FIRST_CARD - CARD_INCREMENT; --j) {
+            dealPermutations.push_back({i, j});
+        }
+    }
+
+    return dealPermutations;
 };
 
 /* shuffle deck and deal from top */
@@ -44,4 +66,9 @@ void Trainer::Shuffle(vector<int>& currentDeal) {
     }
 
     for (unsigned int i = 0; i < currentDeal.size(); ++i) currentDeal.at(i) = deck.at(i);
+};
+
+void Trainer::SetDeckSize(vector<int>& deck, int size) {
+    deck = {};
+    for (unsigned int i = 0; i < size; ++i) deck.push_back(i);
 };
