@@ -11,8 +11,8 @@ class Node {
         vector<double> GetCurrentStrategy(double reachProbability);
         vector<double> GetAverageStrategy(); 
     private:
-        vector<double> sumOfStrategies = {0.0, 0.0};
         const int NUM_ACTIONS = cumulativeRegrets.size();
+        vector<double> sumOfStrategies = {0.0, 0.0};
 
         vector<double> NormalizeVector(vector<double> vector);
 };
