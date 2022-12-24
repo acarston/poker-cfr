@@ -2,7 +2,7 @@
 
 /* normalize positive regrets and update strategy sum */
 vector<double> Node::GetCurrentStrategy(double reachProbablilty) {
-    vector<double> strategy(cumulativeRegrets.size(), 0.0); 
+    vector<double> strategy(NUM_ACTIONS, 0.0); 
 
     for (unsigned int i = 0; i < NUM_ACTIONS; ++i) strategy.at(i) = cumulativeRegrets.at(i);
     strategy = NormalizeVector(strategy);
