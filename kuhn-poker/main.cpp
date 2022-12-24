@@ -9,6 +9,12 @@ int main() {
 
     //TODO: function that permutates all chance nodes, explainer branch
 
+    //Deals that work: {2, 1}, {2, 0}, 
+    //on {1, 2} p0 always acts as if he will lose, ie p1 will never have jack. I guess this makes
+    //sense when isolating this deal; because with {2, x} or {0, x} p1's card does not matter.
+    //It's like he knows the game state instead of the information set
+    //TODO: test {0, x}, {1, 0} to confirm theory
+
     Trainer trainer;
     int numIterations = 100000;
 

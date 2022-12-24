@@ -16,12 +16,13 @@ double KuhnCFR::CalculateUtilities(vector<int> cards, string history, vector<dou
     Node& currentNode = GetNode(key);
 
     // compute current game-state and counterfactual utilities for each node in the game tree
-    vector<double> counterfactualUtilities(NUM_ACTIONS, 0.0);
     vector<double> nodeStrategy = currentNode.GetCurrentStrategy(reachProbabilities.at(currentPlayer));
+    vector<double> counterfactualUtilities(NUM_ACTIONS, 0.0);
+    //vector<double> nodeStrategy = currentNode.GetCurrentStrategy(reachProbabilities.at(currentPlayer)); UPDATE
 
     for (unsigned int i = 0; i < NUM_ACTIONS; ++i) {
         vector<double> nextReachProbabilities = reachProbabilities; //new
-        nextReachProbabilities.at(currentPlayer) = reachProbabilities.at(currentPlayer) * nodeStrategy.at(i); 
+        nextReachProbabilities.at(currentPlayer) *= nodeStrategy.at(i); //UPDTATE
 
         counterfactualUtilities.at(i) = -CalculateUtilities(cards, (history + ACTIONS.at(i)), nextReachProbabilities);
         nodeUtility += counterfactualUtilities.at(i) * nodeStrategy.at(i); //new

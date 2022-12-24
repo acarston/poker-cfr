@@ -7,10 +7,10 @@ void Trainer::Train(int numIterations) {
     vector<int> count = {3,0}; //testing random distros
     for (unsigned int i = 0; i < numIterations; ++i) {
         Shuffle(currentDeal);
-        for (auto j : count) {
-            //FIXME: test at shuffle method
-        }
-        rootNodeUtility += bot.CalculateUtilities({2,1});
+        // for (auto j : count) {
+        //     //FIXME: test at shuffle method
+        // }
+        rootNodeUtility += bot.CalculateUtilities({1,2});
     }
     //cout << count << "\n" << bot.count << "\n\n\n";
 };
@@ -23,7 +23,7 @@ void Trainer::DisplayNodeStrategies(int numIterations) {
     vector<double> strategy(currentDeal.size(), 0.0);
 
     for (it = bot.nodes.begin(); it != bot.nodes.end(); ++it) {
-        if (it->first.size() < 2) continue;
+        //if (it->first.size() < 2) continue; UPDATE
         strategy = it->second.GetAverageStrategy();
         cout << it->first << ": ";
         cout << "bet " << strategy.at(0) << ", pass " << strategy.at(1) << "\n";
