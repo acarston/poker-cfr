@@ -4,10 +4,15 @@
 #include "Trainer.h"
 
 void Trainer::Train(int numIterations) {
+    vector<int> count = {3,0}; //testing random distros
     for (unsigned int i = 0; i < numIterations; ++i) {
         Shuffle(currentDeal);
-        rootNodeUtility += bot.CalculateUtilities(currentDeal);
+        for (auto j : count) {
+            //FIXME: test at shuffle method
+        }
+        rootNodeUtility += bot.CalculateUtilities({2,1});
     }
+    //cout << count << "\n" << bot.count << "\n\n\n";
 };
 
 void Trainer::DisplayNodeStrategies(int numIterations) {

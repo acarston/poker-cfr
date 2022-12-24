@@ -10,6 +10,7 @@ using namespace std;
 class KuhnCFR {
     public:
         unordered_map<string, Node> nodes;
+        int count = 0;
 
         double CalculateUtilities(vector<int> cards, string history = "", vector<double> reachProbabilities = {1.0, 1.0});
     private:
