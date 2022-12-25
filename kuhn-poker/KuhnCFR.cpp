@@ -26,9 +26,9 @@ double KuhnCFR::CalculateUtilities(vector<int> cards, string history, vector<dou
     // add positive regrets to node's cumulative regrets
     int opponent = !bool(currentPlayer);
     for (unsigned int i = 0; i < counterfactualUtilities.size(); ++i) {
-        if (nodeUtility > counterfactualUtilities.at(i)) continue;
-        currentNode.cumulativeRegrets.at(i) += counterfactualUtilities.at(i) - nodeUtility;
-        currentNode.cumulativeRegrets.at(i) *= reachProbabilities.at(opponent);
+        //if (nodeUtility > counterfactualUtilities.at(i)) continue;
+        currentNode.cumulativeRegrets.at(i) += (counterfactualUtilities.at(i) - nodeUtility) * reachProbabilities.at(opponent);
+       // currentNode.cumulativeRegrets.at(i) *= reachProbabilities.at(opponent);
     }
 
     return nodeUtility;
