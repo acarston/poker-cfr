@@ -22,7 +22,6 @@ void Trainer::DisplayNodeStrategies(int numIterations) {
     vector<double> strategy(2, 0.0);
 
     for (it = bot.nodes.begin(); it != bot.nodes.end(); ++it) {
-        if (it->first.size() < 2) continue;
         strategy = it->second.GetAverageStrategy();
         cout << it->first << ": ";
         cout << "bet " << strategy.at(0) << ", pass " << strategy.at(1) << "\n";
