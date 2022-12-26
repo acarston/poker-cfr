@@ -6,12 +6,15 @@
 void Trainer::Train(int numIterations) {
     SetDeckSize(deck, 3);
     vector<vector<int>> dealPermutations = GetDealPermutations(deck);
+    vector<int> permutation = {};
 
+    auto time0 = chrono::high_resolution_clock::now();
     for (unsigned int i = 0; i < numIterations; ++i) {
-        for (vector<int> permutation : dealPermutations) {
-            rootNodeUtility += bot.CalculateUtilities(permutation);
-        }
+        permutation = GetRandomPermutation(dealPermutations);
+        rootNodeUtility += bot.CalculateUtilities(permutation);
     }
+    auto time1 = chrono::high_resolution_clock::now();
+    executionTime = chrono::duration_cast<chrono::seconds>(time1 - time0);
 };
 
 void Trainer::DisplayNodeStrategies(int numIterations) {
@@ -19,18 +22,17 @@ void Trainer::DisplayNodeStrategies(int numIterations) {
     cout << "Node Strategies:\n";
 
     unordered_map<string, Node>::iterator it;
-    vector<double> strategy(2, 0.0);
+    vector<double> strategy = {};
 
     for (it = bot.nodes.begin(); it != bot.nodes.end(); ++it) {
         strategy = it->second.GetAverageStrategy();
         cout << it->first << ": ";
         cout << "bet " << strategy.at(0) << ", pass " << strategy.at(1) << "\n";
     }
-    cout << "\n\nThis program was trained for " << numIterations << " iterations." << endl;
+    cout << "\n\nThis program was trained for " << numIterations << " iterations, taking " << executionTime.count() << " seconds to execute." << endl;
 };
 
 vector<vector<int>> Trainer::GetDealPermutations(vector<int> deck) {
-    const int FIRST_CARD = 0, CARD_INCREMENT = 1;
     vector<vector<int>> dealPermutations = {};
 
     for (int i = deck.at(FIRST_CARD); i < deck.size() - CARD_INCREMENT; ++i) {
@@ -70,4 +72,14 @@ void Trainer::Shuffle(vector<int>& currentDeal) {
 void Trainer::SetDeckSize(vector<int>& deck, int size) {
     deck = {};
     for (unsigned int i = 0; i < size; ++i) deck.push_back(i);
+};
+
+vector<int> Trainer::GetRandomPermutation(vector<vector<int>> permutations) {
+    auto now = chrono::high_resolution_clock::now();
+    random_device rand;
+    mt19937::result_type seed = now.time_since_epoch().count() ^ rand();
+    mt19937 rng(seed);
+
+    uniform_int_distribution<int> dist(FIRST_CARD, permutations.size() - CARD_INCREMENT);
+    return permutations.at(dist(rng));
 };
