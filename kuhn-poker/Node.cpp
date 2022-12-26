@@ -4,9 +4,13 @@
 vector<double> Node::GetCurrentStrategy(double reachProbablilty) {
     vector<double> strategy(NUM_ACTIONS, 0.0); 
 
-    for (unsigned int i = 0; i < NUM_ACTIONS; ++i) strategy.at(i) = cumulativeRegrets.at(i);
+    for (unsigned int i = 0; i < NUM_ACTIONS; ++i) {
+        strategy.at(i) = (cumulativeRegrets.at(i) > 0) ? cumulativeRegrets.at(i) : 0.0;
+    }
     strategy = NormalizeVector(strategy);
-    for (unsigned int i = 0; i < NUM_ACTIONS; ++i) sumOfStrategies.at(i) += strategy.at(i) * reachProbablilty;
+    for (unsigned int i = 0; i < NUM_ACTIONS; ++i){
+        sumOfStrategies.at(i) += strategy.at(i) * reachProbablilty;
+    }
     
     return strategy;
 };
