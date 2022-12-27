@@ -2,10 +2,10 @@
 
 int main() {
     Trainer trainer;
-    int numIterations = 1000000;
+    trainer.numIterations = 1000000;
 
-    trainer.Train(numIterations);
-    trainer.DisplayNodeStrategies(numIterations);
+    trainer.Train();
+    trainer.DisplayNodeStrategies();
 
     return 0;
 };
