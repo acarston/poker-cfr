@@ -57,7 +57,6 @@ void Trainer::SetDeckSize(vector<int>& deck, int size) {
 vector<int> Trainer::GetRandomPermutation(vector<vector<int>> permutations) {
     std::random_device dev;
     std::mt19937 rng(dev());
-    rng.seed(dev());
     uniform_int_distribution<int> dist(FIRST_CARD, permutations.size() - CARD_INCREMENT);
     return permutations[dist(rng)];
 };
