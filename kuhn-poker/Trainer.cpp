@@ -14,7 +14,7 @@ void Trainer::Train(int numIterations) {
         rootNodeUtility += bot.CalculateUtilities(permutation);
     }
     auto time1 = chrono::high_resolution_clock::now();
-    executionTime = chrono::duration_cast<chrono::seconds>(time1 - time0);
+    executionTime = chrono::duration_cast<chrono::milliseconds>(time1 - time0);
 };
 
 void Trainer::DisplayNodeStrategies(int numIterations) {
@@ -27,15 +27,15 @@ void Trainer::DisplayNodeStrategies(int numIterations) {
     for (it = bot.nodes.begin(); it != bot.nodes.end(); ++it) {
         strategy = it->second.GetAverageStrategy();
         cout << it->first << ": ";
-        cout << "bet " << strategy.at(0) << ", pass " << strategy.at(1) << "\n";
+        cout << "bet " << strategy[0] << ", pass " << strategy[1] << "\n";
     }
-    cout << "\n\nThis program was trained for " << numIterations << " iterations, taking " << executionTime.count() << " seconds to execute." << endl;
+    cout << "\n\nThis program was trained for " << numIterations << " iterations, taking " << executionTime.count() << " milliseconds to execute." << endl;
 };
 
 vector<vector<int>> Trainer::GetDealPermutations(vector<int> deck) {
     vector<vector<int>> dealPermutations = {};
 
-    for (int i = deck.at(FIRST_CARD); i < deck.size() - CARD_INCREMENT; ++i) {
+    for (int i = deck[FIRST_CARD]; i < deck.size() - CARD_INCREMENT; ++i) {
         for (int j = i + CARD_INCREMENT; j < deck.size(); ++j) {
             dealPermutations.push_back({i, j});
         }
@@ -47,26 +47,6 @@ vector<vector<int>> Trainer::GetDealPermutations(vector<int> deck) {
     }
 
     return dealPermutations;
-};
-
-/* shuffle deck and deal from top */
-void Trainer::Shuffle(vector<int>& currentDeal) { 
-    vector<int> deck = {0, 1, 2};
-
-    random_device dev;
-    mt19937 rng(dev());
-    uniform_int_distribution<mt19937::result_type> dist6(0, deck.size() - 1);
-    
-    // Fisher-Yates shuffling algorithm
-    int j, temp;
-    for (unsigned int i = deck.size() - 1; i > 0; --i) {
-        j = dist6(rng);
-        temp = deck.at(i);
-        deck.at(i) = deck.at(j);
-        deck.at(j) = temp;
-    }
-
-    for (unsigned int i = 0; i < currentDeal.size(); ++i) currentDeal.at(i) = deck.at(i);
 };
 
 void Trainer::SetDeckSize(vector<int>& deck, int size) {
@@ -81,5 +61,5 @@ vector<int> Trainer::GetRandomPermutation(vector<vector<int>> permutations) {
     mt19937 rng(seed);
 
     uniform_int_distribution<int> dist(FIRST_CARD, permutations.size() - CARD_INCREMENT);
-    return permutations.at(dist(rng));
+    return permutations[dist(rng)];
 };
