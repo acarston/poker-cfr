@@ -55,11 +55,9 @@ void Trainer::SetDeckSize(vector<int>& deck, int size) {
 };
 
 vector<int> Trainer::GetRandomPermutation(vector<vector<int>> permutations) {
-    auto now = chrono::high_resolution_clock::now();
-    random_device rand;
-    mt19937::result_type seed = now.time_since_epoch().count() ^ rand();
-    mt19937 rng(seed);
-
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    rng.seed(dev());
     uniform_int_distribution<int> dist(FIRST_CARD, permutations.size() - CARD_INCREMENT);
     return permutations[dist(rng)];
 };
