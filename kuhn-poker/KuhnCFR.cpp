@@ -9,23 +9,23 @@ double KuhnCFR::CalculateUtilities(vector<int> cards, string history, vector<dou
     if (history.size() > 1) nodeUtility = GetTerminalUtility(history, cards, nodeUtility, currentPlayer);
     if (nodeUtility != 0.0) return nodeUtility;
 
-    string key = to_string(cards.at(currentPlayer)) + history;
+    string key = to_string(cards[currentPlayer]) + history;
     Node& currentNode = GetNode(key);
 
     // compute current game-state and counterfactual utilities for current and reachable nodes
-    vector<double> nodeStrategy = currentNode.GetCurrentStrategy(reachProbabilities.at(currentPlayer));
+    vector<double> nodeStrategy = currentNode.GetCurrentStrategy(reachProbabilities[currentPlayer]);
     vector<double> nextReachProbabilities(NUM_ACTIONS, 0.0), counterfactualUtilities(NUM_ACTIONS, 0.0);
     for (unsigned int i = 0; i < NUM_ACTIONS; ++i) {
         nextReachProbabilities = reachProbabilities;
-        nextReachProbabilities.at(currentPlayer) *= nodeStrategy.at(i); 
-        counterfactualUtilities.at(i) = -CalculateUtilities(cards, (history + ACTIONS.at(i)), nextReachProbabilities);
-        nodeUtility += counterfactualUtilities.at(i) * nodeStrategy.at(i);
+        nextReachProbabilities[currentPlayer] *= nodeStrategy[i]; 
+        counterfactualUtilities[i] = -CalculateUtilities(cards, (history + ACTIONS[i]), nextReachProbabilities);
+        nodeUtility += counterfactualUtilities[i] * nodeStrategy[i];
     }
 
     // add positive regrets to node's cumulative regrets
     int opponent = !bool(currentPlayer);
     for (unsigned int i = 0; i < counterfactualUtilities.size(); ++i) {
-        currentNode.cumulativeRegrets.at(i) += (counterfactualUtilities.at(i) - nodeUtility) * reachProbabilities.at(opponent);
+        currentNode.cumulativeRegrets[i] += (counterfactualUtilities[i] - nodeUtility) * reachProbabilities[opponent];
     }
 
     return nodeUtility;
@@ -40,7 +40,7 @@ double KuhnCFR::GetTerminalUtility(string history, vector<int> cards, double nod
     else if (terminalHistory == "bb") nodeUtility = 2.0;
     else if (terminalHistory == "pp") nodeUtility = 1.0;
 
-    int loser = (cards.at(PLAYER_1) < cards.at(PLAYER_2)) ? PLAYER_1 : PLAYER_2;
+    int loser = (cards[PLAYER_1] < cards[PLAYER_2]) ? PLAYER_1 : PLAYER_2;
     bool isLoser = currentPlayer == loser;
     if (isLoser) nodeUtility *= -1.0;
 
