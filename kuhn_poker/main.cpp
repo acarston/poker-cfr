@@ -1,10 +1,10 @@
-#include "Trainer.cpp"
+#include "Trainer.h"
 
 int main() {
     Trainer trainer;
-    trainer.numIterations = 1000000;
+    trainer.numIterations = 10000000;
 
-    trainer.Train();
+    trainer.TrainTest();
     trainer.DisplayNodeStrategies();
 
     return 0;
