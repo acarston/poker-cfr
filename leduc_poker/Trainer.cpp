@@ -1,22 +1,18 @@
-#include <random>
-#include <iostream>
-#include <algorithm>
-
 #include "Trainer.h"
 
 /* use CFR starting with a predetermined random deal for a number of iterations */
 void Trainer::train(const unsigned int iterations) {
     this->iterations = iterations;
 
-    std::vector<int> deck = get_deck(3);
-    std::vector<std::vector<int>> dealPerms = get_deal_perms(deck);
-    std::vector<int> randIndexes = get_rand_indexes(dealPerms.size() - 1);
+    const int deckSize = 3, deckRepeats = 2, numHoleCards = 2, numStreetCards = 1;
+    std::vector<int> deck = get_deck(deckSize, deckRepeats);
+    // std::vector<std::vector<int>> dealPerms = get_deal_perms(deck);
+    // std::vector<int> randIndexes = get_rand_indexes(dealPerms.size() - 1);
+    std::vector<std::vector<std::vector<int>>> deals = get_deals(deck, numHoleCards, numStreetCards);
 
     for (unsigned int i = 0; i < iterations; ++i) {
-        for (int j = 0; j < 2; ++j) {
-            if (j == 1) rootNodeUtil += bot.mccfr(j, i + 1, dealPerms[randIndexes[i]]);
-            else bot.mccfr(j, i + 1, dealPerms[randIndexes[i]]);
-        }
+        const int targetPlayer = (i % 2 == 0) ? 0 : 1;
+        bot.mccfr(targetPlayer, i + 1, deals[i][0], deals[i][1]);
     }
 };
 
@@ -33,12 +29,15 @@ void Trainer::display_strats() const {
     std::cout << "\n\nThis program was trained for " << iterations << " iterations." << std::endl;
 };
 
-std::vector<int> Trainer::get_deck(const int size) const {
+std::vector<int> Trainer::get_deck(const int size, const int repeats) const {
     std::vector<int> deck;
-    for (int i = 0; i < size; ++i) deck.push_back(i);
+    for (int i = 0; i < size; ++i) {
+        for (int j = 0; j < repeats; ++j) deck.push_back(i);
+    }
     return deck;
 };
 
+// TODO: deprecate
 std::vector<std::vector<int>> Trainer::get_deal_perms(const std::vector<int>& deck) const {
     std::vector<std::vector<int>> dealPerms;
 
@@ -56,16 +55,32 @@ std::vector<std::vector<int>> Trainer::get_deal_perms(const std::vector<int>& de
     return dealPerms;
 };
 
+// /* generate a vector of random indexes with a size equal to the number of iterations */
+// std::vector<int> Trainer::get_rand_indexes(const int range) const {
+//     std::vector<int> indexes(iterations);
+//
+//     std::random_device dev;
+//     std::mt19937_64 rng(dev());
+//     std::uniform_int_distribution<int> dist(0, range);
+//
+//     for (int i = 0; i < iterations; ++i) indexes[i] = dist(rng);
+//
+//     return indexes;
+// };
 
-/* generate a vector of random indexes with a size equal to the number of iterations */
-std::vector<int> Trainer::get_rand_indexes(const int range) const {
-    std::vector<int> indexes(iterations);
-
+std::vector<std::vector<std::vector<int>>> Trainer::get_deals(std::vector<int>& cards, const int numHoleCards, const int numStreetCards) const {
+    std::vector<std::vector<std::vector<int>>> deals(iterations, std::vector<std::vector<int>>(2));
+    
     std::random_device dev;
     std::mt19937_64 rng(dev());
-    std::uniform_int_distribution<int> dist(0, range);
 
-    for (int i = 0; i < iterations; ++i) indexes[i] = dist(rng);
+    for (int i = 0; i < iterations; ++i) {
+        std::shuffle(cards.begin(), cards.end(), rng);
+        for (int j = 0; j < numHoleCards + numStreetCards; ++j) {
+            if (j < numHoleCards) deals[i][0].push_back(cards[j]);
+            else deals[i][1].push_back(cards[j]);
+        }
+    }
 
-    return indexes;
-};
+    return deals;
+}

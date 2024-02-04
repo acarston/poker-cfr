@@ -5,11 +5,12 @@
 
 class Node {
 public:
-	Node();
+	Node(const int lastActions, const int lastAction);
 	~Node();
 
-	int get_num_actions() const { return this->numActions; }
-	double* get_cumul_regrets() const { return this->cumulRegrets; }
+	int num_actions() const { return this->numActions; }
+	int* get_actions() const { return this->actions; }
+	double* cumul_regrets() const { return this->cumulRegrets; }
 
 	double* strategy();
 	void update_sum(const unsigned int iteration, const double iterWeight);
@@ -21,6 +22,7 @@ private:
 	std::string history;
 
 	int numActions = 0;
+	int* actions = nullptr;
 	double* cumulRegrets = nullptr;
 	double* strat = nullptr;
 	double* stratSum = nullptr;
