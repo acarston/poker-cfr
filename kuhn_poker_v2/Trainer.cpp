@@ -13,10 +13,8 @@ void Trainer::train(const unsigned int iterations) {
     std::vector<int> randIndexes = get_rand_indexes(dealPerms.size() - 1);
 
     for (unsigned int i = 0; i < iterations; ++i) {
-        for (int j = 0; j < 2; ++j) {
-            if (j == 1) rootNodeUtil += bot.mccfr(j, i + 1, dealPerms[randIndexes[i]]);
-            else bot.mccfr(j, i + 1, dealPerms[randIndexes[i]]);
-        }
+        const int targetPlayer = (i % 2 == 0) ? 0 : 1;
+        bot.mccfr(targetPlayer, i + 1, dealPerms[randIndexes[i]]);
     }
 };
 
