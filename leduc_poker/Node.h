@@ -19,8 +19,6 @@ public:
 	static void normalize(double* arr, int n);
 
 private:
-	std::string history;
-
 	int numActions = 0;
 	int* actions = nullptr;
 	double* cumulRegrets = nullptr;

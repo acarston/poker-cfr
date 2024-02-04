@@ -1,26 +1,31 @@
 #include "CFR.h"
-#include <iostream> //test, DELETE
 
-// TODO: pass in pot = 0
-double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const std::vector<int>& holeCards, const std::vector<int>& streetCards, int pot, int passedStreets, int infoset, int numPastActions) {
+double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const std::vector<int>& holeCards, const std::vector<int>& streetCards, int pot, int passedStreets, int sinceChance, int infoset, int numPastActions) {
     const int curPlayer = (numPastActions % 2 == 0) ? 0 : 1;
 
     double nodeUtil = 0.0;
-    const int lastActions = infoset & 0b111111 ;
+    const int lastActions = (sinceChance > 1) ? infoset & 0b111111 : (infoset & 0b111111) >> (2 - sinceChance) * 3; // since chance????
     const int lastAction = lastActions & 0b111;
     // nodeUtil = terminal_util(holeCards, infoset, lastActions, curPlayer);
     // if (nodeUtil) return nodeUtil;
+
+    for (int i = 0; i < passedStreets; ++i) {
+        infoset <<= 2;
+        infoset ^= streetCards[i] + 1;
+    }
     
     // if raise-call or check-check, fold
-    if (lastActions == 0b011010 || lastActions == 0b001001) {
+    if ((lastActions == 0b011010 || lastActions == 0b001001) && sinceChance > 1) {
         if (passedStreets < NUM_STREETS) {
             infoset <<= 2;
-            infoset = infoset ^ streetCards[passedStreets] + 1;
+            infoset = infoset ^ streetCards[passedStreets] + 1; // this and others to ^=
+            sinceChance = 0;
             ++passedStreets;
         }
         else return pot;
     }
     else if (lastAction == 0b100) return pot;
+    ++sinceChance;
 
     infoset <<= 2;
     infoset = infoset ^ holeCards[curPlayer] + 1;
@@ -44,15 +49,10 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     if (curPlayer != targetPlayer) {
         std::discrete_distribution<int> dist(nodeStrat, nodeStrat + numActions);
 
-        // test block
-        const int actionIndex = dist(this->engine);
-        if (actionIndex >= numActions || actionIndex < 0) std::cerr << "Invalid action index: " << actionIndex << std::endl;
-
-        // const int action = actions[dist(this->engine)]; // uncomment
-        const int action = actions[actionIndex]; // comment
+        const int action = actions[dist(this->rng)];
         if (action == 0b011) pot += 2 * passedStreets;
         if (lastAction == 0b011) pot *= 2;
-        return -mccfr(targetPlayer, iteration, holeCards, streetCards, pot, passedStreets, infoset ^ action, numPastActions + 1);
+        return -mccfr(targetPlayer, iteration, holeCards, streetCards, pot, passedStreets, sinceChance, infoset ^ action, numPastActions + 1);
     }
 
     std::vector<double> cfUtils(numActions);
@@ -60,7 +60,7 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
         const int action = actions[i];
         if (action == 0b011) pot += 2 * passedStreets;
         if (lastAction == 0b011) pot *= 2;
-        cfUtils[i] = -mccfr(targetPlayer, iteration, holeCards, streetCards, pot, passedStreets, infoset ^ action, numPastActions + 1);
+        cfUtils[i] = -mccfr(targetPlayer, iteration, holeCards, streetCards, pot, passedStreets, sinceChance, infoset ^ action, numPastActions + 1);
         nodeUtil += cfUtils[i] * nodeStrat[i];
     }
 

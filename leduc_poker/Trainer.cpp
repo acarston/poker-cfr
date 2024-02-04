@@ -21,10 +21,18 @@ void Trainer::display_strats() const {
     std::cout << "Node Strategies:\n";
 
     double* strategy = nullptr;
+    int* actions = nullptr;
     for (auto it = bot.nodes.begin(); it != bot.nodes.end(); ++it) {
         strategy = it->second->avg_strategy();
-        std::cout << it->first << ": ";
-        std::cout << "bet " << strategy[0] << ", pass " << strategy[1] << "\n";
+        actions = it->second->get_actions();
+
+        std::bitset<10> x(it->first);
+        std::cout << x << ": ";
+        for (int i = 0; i < it->second->num_actions(); ++i) {
+            std::bitset<3> y(actions[i]);
+            std::cout << y << ": " << strategy[i] << "  ";
+        }
+        std::cout << "\n";
     }
     std::cout << "\n\nThis program was trained for " << iterations << " iterations." << std::endl;
 };

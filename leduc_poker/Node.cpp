@@ -20,7 +20,7 @@ Node::Node(const int lastActions, const int lastAction) {
         }
     }
     // test block
-    else std::cerr << "Invalid action number: last actions: " << lastActions << " last action: " << lastAction << " first action: " << firstAction;
+    if (numActions == 0) std::cout << "Invalid action number: last actions: " << lastActions << " last action: " << lastAction << " first action: " << firstAction << "\n";
 
     this->strat = new double[numActions];
     this->stratSum = new double[numActions];
