@@ -1,8 +1,7 @@
 #include "Node.h"
-#include <iostream> // for testing, REMOVE
 
-Node::Node(const int lastActions, const int lastAction) {
-    // this->numActions = 2; // to be decided here
+Node::Node(const int lastActions, const int lastAction, const int passedStreets) {
+    this->passedStreets = passedStreets;
 
     const int firstAction = lastActions >> 3;
     if (lastActions == 0 || lastAction == 0b001 || lastAction == 0b010) {
@@ -19,8 +18,6 @@ Node::Node(const int lastActions, const int lastAction) {
             this->actions = new int[numActions] { 0b100, 0b010 };
         }
     }
-    // test block
-    if (numActions == 0) std::cout << "Invalid action number: last actions: " << lastActions << " last action: " << lastAction << " first action: " << firstAction << "\n";
 
     this->strat = new double[numActions];
     this->stratSum = new double[numActions];

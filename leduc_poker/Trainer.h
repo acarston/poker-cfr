@@ -5,6 +5,7 @@
 #include <iostream>
 #include <algorithm>
 #include <bitset>
+#include <unordered_map>
 
 #include "CFR.h"
 

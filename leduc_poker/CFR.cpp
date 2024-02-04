@@ -6,8 +6,6 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     double nodeUtil = 0.0;
     const int lastActions = (sinceChance > 1) ? infoset & 0b111111 : (infoset & 0b111111) >> (2 - sinceChance) * 3; // since chance????
     const int lastAction = lastActions & 0b111;
-    // nodeUtil = terminal_util(holeCards, infoset, lastActions, curPlayer);
-    // if (nodeUtil) return nodeUtil;
 
     for (int i = 0; i < passedStreets; ++i) {
         infoset <<= 2;
@@ -18,7 +16,7 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     if ((lastActions == 0b011010 || lastActions == 0b001001) && sinceChance > 1) {
         if (passedStreets < NUM_STREETS) {
             infoset <<= 2;
-            infoset = infoset ^ streetCards[passedStreets] + 1; // this and others to ^=
+            infoset ^= streetCards[passedStreets] + 1;
             sinceChance = 0;
             ++passedStreets;
         }
@@ -28,11 +26,11 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     ++sinceChance;
 
     infoset <<= 2;
-    infoset = infoset ^ holeCards[curPlayer] + 1;
+    infoset ^= holeCards[curPlayer] + 1;
 
     Node* node = this->nodes[infoset];
     if (node == nullptr) {
-        node = new Node(lastActions, lastAction); // pass in infoset, passedStreets or just infosetCardless,
+        node = new Node(lastActions, lastAction, passedStreets); // TODO: pass in passedStreets for printing ease
         this->nodes[infoset] = node;
     }
 
@@ -40,8 +38,8 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     infoset <<= 3;
 
     const double* nodeStrat = node->strategy();
-    const int numActions = node->num_actions(); // set in constructor
-    const int* actions = node->get_actions(); // actions, returns an array of 0bs, set in constructor
+    const int numActions = node->num_actions();
+    const int* actions = node->get_actions();
     const double iterWeight = double(iteration) / (iteration + 1000);
 
     node->update_sum(iteration, iterWeight);
@@ -68,22 +66,4 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     for (int i = 0; i < numActions; ++i) cumulRegrets[i] += (cfUtils[i] - nodeUtil) * iterWeight;
 
     return nodeUtil;
-}
-
-// TODO: deprecate
-double CFR::terminal_util(const std::vector<int>& cards, int infoset, const int lastActions, const int curPlayer) const {
-    if (!(infoset & 0b100 || infoset & 0b1000)) return 0;
-
-    int payoff = 0;
-    int terminalHist = infoset & 0b1111;
-
-    if (terminalHist == 0b1001) return 0;
-    if (terminalHist == 0b0110) return 1;
-    if (terminalHist == 0b1010) payoff = 1;
-    else payoff = 2;
-
-    int loser = (cards[0] < cards[1]) ? 0 : 1;
-    if (curPlayer == loser) payoff *= -1;
-
-    return payoff;
 }

@@ -15,9 +15,6 @@ public:
 	std::unordered_map<int, Node*> nodes;
 
 private:
-	// TODO: deprecate
-	double terminal_util(const std::vector<int>& cards, int infoset, const int lastActions, const int curPlayer) const;
-
 	const int NUM_STREETS = 1;
 
 	std::random_device dev;

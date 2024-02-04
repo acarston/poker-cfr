@@ -20,18 +20,36 @@ void Trainer::display_strats() const {
     std::cout << "Average utility of the root node:\n" << (rootNodeUtil / iterations) << "\n\n";
     std::cout << "Node Strategies:\n";
 
+    std::unordered_map<int, std::string> options { { 0b001, "check" }, { 0b010, "call" }, { 0b011, "raise" }, { 0b100, "fold" } };
+
     double* strategy = nullptr;
     int* actions = nullptr;
     for (auto it = bot.nodes.begin(); it != bot.nodes.end(); ++it) {
-        strategy = it->second->avg_strategy();
-        actions = it->second->get_actions();
+        auto infoset = it->first;
+        auto& node = it->second;
 
-        std::bitset<10> x(it->first);
-        std::cout << x << ": ";
-        for (int i = 0; i < it->second->num_actions(); ++i) {
-            std::bitset<3> y(actions[i]);
-            std::cout << y << ": " << strategy[i] << "  ";
+        strategy = node->avg_strategy();
+        actions = node->get_actions();
+
+        int holeCard = infoset & 0b11;
+        infoset >>= 2;
+        int streetCard = 0;
+        if (node->passed_streets() > 0) {
+            streetCard = infoset & 0b11;
+            infoset >>= 2;
         }
+
+        std::cout << "hole card: " << holeCard << "  ";
+        std::cout << "street card: " << streetCard << "  ";
+        std::cout << "ACTIONS: ";
+
+        while (infoset) {
+            std::cout << options[infoset & 0b111] << " ";
+            infoset >>= 3;
+        }
+
+        std::cout << " STRATEGY: ";
+        for (int i = 0; i < node->num_actions(); ++i) std::cout << options[actions[i]] << ": " << strategy[i] << "  ";
         std::cout << "\n";
     }
     std::cout << "\n\nThis program was trained for " << iterations << " iterations." << std::endl;
