@@ -28,9 +28,6 @@ void Trainer::display_strats() const {
         auto infoset = it->first;
         auto& node = it->second;
 
-        strategy = node->avg_strategy();
-        actions = node->get_actions();
-
         int holeCard = infoset & 0b11;
         infoset >>= 2;
         int streetCard = 0;
@@ -47,6 +44,9 @@ void Trainer::display_strats() const {
             std::cout << options[infoset & 0b111] << " ";
             infoset >>= 3;
         }
+
+        strategy = node->avg_strategy();
+        actions = node->get_actions();
 
         std::cout << " STRATEGY: ";
         for (int i = 0; i < node->num_actions(); ++i) std::cout << options[actions[i]] << ": " << strategy[i] << "  ";

@@ -4,7 +4,8 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     const int curPlayer = (numPastActions % 2 == 0) ? 0 : 1;
 
     double nodeUtil = 0.0;
-    const int lastActions = (sinceChance > 1) ? infoset & 0b111111 : (infoset & 0b111111) >> (2 - sinceChance) * 3; // since chance????
+    // generalizes?? || passedStreets == 0 new addition
+    const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset& (0b1 << sinceChance * 3) - 1;
     const int lastAction = lastActions & 0b111;
 
     for (int i = 0; i < passedStreets; ++i) {
@@ -20,9 +21,9 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
             sinceChance = 0;
             ++passedStreets;
         }
-        else return pot;
+        else return pot; // TODO: terminal util function
     }
-    else if (lastAction == 0b100) return pot;
+    else if (lastAction == 0b100) return pot; // -pot ??
     ++sinceChance;
 
     infoset <<= 2;
@@ -30,7 +31,7 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
 
     Node* node = this->nodes[infoset];
     if (node == nullptr) {
-        node = new Node(lastActions, lastAction, passedStreets); // TODO: pass in passedStreets for printing ease
+        node = new Node(lastActions, lastAction, passedStreets);
         this->nodes[infoset] = node;
     }
 
