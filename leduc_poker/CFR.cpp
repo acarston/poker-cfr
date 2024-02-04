@@ -4,29 +4,31 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     const int curPlayer = (numPastActions % 2 == 0) ? 0 : 1;
 
     double nodeUtil = 0.0;
-    // generalizes?? || passedStreets == 0 new addition
-    const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset& (0b1 << sinceChance * 3) - 1;
+    const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset& (0b1 << sinceChance * ACTION_LEN) - 1;
     const int lastAction = lastActions & 0b111;
 
     for (int i = 0; i < passedStreets; ++i) {
-        infoset <<= 2;
+        infoset <<= CARD_LEN;
         infoset ^= streetCards[i] + 1;
     }
     
     // if raise-call or check-check, fold
-    if ((lastActions == 0b011010 || lastActions == 0b001001) && sinceChance > 1) {
-        if (passedStreets < NUM_STREETS) {
-            infoset <<= 2;
-            infoset ^= streetCards[passedStreets] + 1;
-            sinceChance = 0;
-            ++passedStreets;
-        }
-        else return pot; // TODO: terminal util function
+    //if ((lastActions == 0b011010 || lastActions == 0b001001) && sinceChance > 1) {
+    if (lastActions == 0b011010 || lastActions == 0b001001) {
+        //if (passedStreets < NUM_STREETS) {
+        //    infoset <<= CARD_LEN;
+        //    infoset ^= streetCards[passedStreets] + 1;
+        //    sinceChance = 0;
+        //    ++passedStreets;
+        //}
+        //else return (winner(curPlayer, holeCards, streetCards, passedStreets)) ? pot : -pot;
+
+        return (winner(curPlayer, holeCards, streetCards, passedStreets)) ? pot : -pot; // TEST
     }
-    else if (lastAction == 0b100) return pot; // -pot ??
+    else if (lastAction == 0b100) return -pot; // -pot ??
     ++sinceChance;
 
-    infoset <<= 2;
+    infoset <<= CARD_LEN;
     infoset ^= holeCards[curPlayer] + 1;
 
     Node* node = this->nodes[infoset];
@@ -35,8 +37,8 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
         this->nodes[infoset] = node;
     }
 
-    infoset >>= passedStreets * 2 + 2;
-    infoset <<= 3;
+    infoset >>= passedStreets * CARD_LEN + CARD_LEN;
+    infoset <<= ACTION_LEN;
 
     const double* nodeStrat = node->strategy();
     const int numActions = node->num_actions();
@@ -67,4 +69,15 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     for (int i = 0; i < numActions; ++i) cumulRegrets[i] += (cfUtils[i] - nodeUtil) * iterWeight;
 
     return nodeUtil;
+}
+
+bool CFR::winner(const int curPlayer, const std::vector<int>& holeCards, const std::vector<int>& streetCards, int passedStreets) const {
+    int playerCard = holeCards[curPlayer], oppCard = holeCards[!curPlayer];
+    if (passedStreets) {
+        for (int streetCard : streetCards) {
+            if (playerCard == streetCard) return true;
+            else if (oppCard == streetCard) return false;
+        }
+    }
+    return playerCard > oppCard;
 }

@@ -15,7 +15,11 @@ public:
 	std::unordered_map<int, Node*> nodes;
 
 private:
+	bool winner(const int curPlayer, const std::vector<int>& holeCards, const std::vector<int>& streetCards, int passedStreets) const;
+
 	const int NUM_STREETS = 1;
+	const int CARD_LEN = 2;
+	const int ACTION_LEN = 3;
 
 	std::random_device dev;
 	std::mt19937 rng { dev() };
