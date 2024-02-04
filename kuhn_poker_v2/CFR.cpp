@@ -27,7 +27,7 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
 
     if (curPlayer != targetPlayer) {
         std::discrete_distribution<int> dist(nodeStrat, nodeStrat + numActions);
-        const int iAction = dist(this->engine);
+        const int iAction = dist(this->rng);
 
         return -mccfr(targetPlayer, iteration, cards, infoset ^ iAction + 1, numPastActions + 1);
     }

@@ -17,7 +17,8 @@ public:
 private:
 	double terminal_util(const std::vector<int>& cards, int infoset, const int curPlayer) const;
 
-	std::mt19937 engine;
+	std::random_device dev;
+	std::mt19937 rng{ dev() };
 };
 
 #endif
