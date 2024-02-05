@@ -11,17 +11,28 @@
 
 class Trainer {
 public:
+    Trainer();
+
     void train(const unsigned int iterations);
     void display_strats() const;
 private:
     CFR bot;
+
+    const int NUM_HOLE_CARDS = 2;
+    const int NUM_STREET_CARDS = 1;
+    const int DECK_SIZE = 3;
+    const int DECK_REPEATS = 2;
+
     double rootNodeUtil = 0.0;
     int iterations = 0;
 
-    std::vector<int> get_deck(const int size, const int repeats) const;
-    std::vector<std::vector<int>> get_deal_perms(const std::vector<int>& deck) const; // deprecate pls
-    // std::vector<int> get_rand_indexes(const int range) const;
-    std::vector<std::vector<std::vector<int>>> get_deals(std::vector<int>& cards, const int numHoleCards, const int numStreetCards) const;
+    std::random_device dev;
+    std::mt19937_64 rng { dev() };
+
+    std::vector<int> deck;
+    std::vector<std::vector<int>> deal { { 0, 0 }, { 0 } };
+
+    void shuffle();
 };
 
 #endif
