@@ -2,7 +2,7 @@
 
 int main() {
     Trainer trainer;
-    trainer.numIterations = 10000000;
+    trainer.numIterations = 1000000000;
 
     trainer.TrainTest();
     trainer.DisplayNodeStrategies();

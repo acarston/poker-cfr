@@ -51,6 +51,12 @@ void Trainer::display_strats() const {
 
         std::cout << " STRATEGY: ";
         for (int i = 0; i < node->num_actions(); ++i) std::cout << options[actions[i]] << ": " << strategy[i] << "  ";
+
+        std::cout << " REGRETS: "; // TEST
+        for (int i = 0; i < node->num_actions(); ++i) std::cout << node->cumul_regrets()[i] << "  "; // TEST
+        // std::cout << " STRATEGY: ";
+        // for (int i = 0; i < node->num_actions(); ++i) std::cout << options[actions[i]] << ": " << node->strategy()[i] << "  ";
+
         std::cout << "\n";
     }
     std::cout << "\n\nThis program was trained for " << iterations << " iterations." << std::endl;

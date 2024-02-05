@@ -19,10 +19,17 @@ Node::Node(const int lastActions, const int lastAction, const int passedStreets)
         }
     }
 
-    this->strat = new double[numActions];
-    this->stratSum = new double[numActions];
-    this->cumulRegrets = new double[numActions];
-    this->avgStrat = new double[numActions];
+    this->strat = new double[this->numActions];
+    this->stratSum = new double[this->numActions];
+    this->cumulRegrets = new double[this->numActions];
+    this->avgStrat = new double[this->numActions];
+
+    for (int i = 0; i < this->numActions; ++i) {
+        this->strat[i] = 0.0;
+        this->stratSum[i] = 0.0;
+        this->cumulRegrets[i] = 0.0;
+        this->avgStrat[i] = 0.0;
+    }
 }
 
 Node::~Node() {
@@ -41,7 +48,8 @@ double* Node::strategy() {
 
 void Node::update_sum(const unsigned int iteration, const double iterWeight) {
     for (int i = 0; i < numActions; ++i) {
-        if (iteration > WARMUP) stratSum[i] += strat[i] * iterWeight;
+        // if (iteration > WARMUP) stratSum[i] += strat[i] * iterWeight;
+        stratSum[i] += strat[i] * iterWeight;
     }
 }
 

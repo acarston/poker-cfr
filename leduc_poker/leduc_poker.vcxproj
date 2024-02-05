@@ -129,13 +129,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CFR.h" />
-    <ClInclude Include="Game.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Trainer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CFR.cpp" />
-    <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="Trainer.cpp" />

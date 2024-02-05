@@ -2,6 +2,6 @@
 
 int main() {
 	Trainer trainer;
-	trainer.train(1000000);
+	trainer.train(10000000);
 	trainer.display_strats();
 }
