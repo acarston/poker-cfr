@@ -15,7 +15,7 @@ private:
 	const int ACTION_LEN = 3;
 
 	std::random_device dev;
-	std::mt19937 rng { dev() };
+	std::mt19937 rng{ dev() };
 
 public:
 	std::unordered_map<int, Node*> nodes;

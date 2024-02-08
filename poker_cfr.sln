@@ -11,7 +11,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kuhn_poker_v2", "kuhn_poker
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_proj", "test_proj\test_proj.vcxproj", "{B320740C-9B92-47BB-A6FE-2FF7F7B264B8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leduc_poker_v3", "leduc_poker_v3\leduc_poker_v3.vcxproj", "{0388C6BB-85B0-4202-988B-301E9A24CA45}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kuhn_poker_v3", "leduc_poker_v3\leduc_poker_v3.vcxproj", "{0388C6BB-85B0-4202-988B-301E9A24CA45}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reduc_poker", "reduc_poker\reduc_poker.vcxproj", "{44F7380C-EDE0-4610-992B-362B58095BE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,14 @@ Global
 		{0388C6BB-85B0-4202-988B-301E9A24CA45}.Release|x64.Build.0 = Release|x64
 		{0388C6BB-85B0-4202-988B-301E9A24CA45}.Release|x86.ActiveCfg = Release|Win32
 		{0388C6BB-85B0-4202-988B-301E9A24CA45}.Release|x86.Build.0 = Release|Win32
+		{44F7380C-EDE0-4610-992B-362B58095BE9}.Debug|x64.ActiveCfg = Debug|x64
+		{44F7380C-EDE0-4610-992B-362B58095BE9}.Debug|x64.Build.0 = Debug|x64
+		{44F7380C-EDE0-4610-992B-362B58095BE9}.Debug|x86.ActiveCfg = Debug|Win32
+		{44F7380C-EDE0-4610-992B-362B58095BE9}.Debug|x86.Build.0 = Debug|Win32
+		{44F7380C-EDE0-4610-992B-362B58095BE9}.Release|x64.ActiveCfg = Release|x64
+		{44F7380C-EDE0-4610-992B-362B58095BE9}.Release|x64.Build.0 = Release|x64
+		{44F7380C-EDE0-4610-992B-362B58095BE9}.Release|x86.ActiveCfg = Release|Win32
+		{44F7380C-EDE0-4610-992B-362B58095BE9}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
