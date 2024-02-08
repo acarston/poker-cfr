@@ -6,7 +6,12 @@ Trainer::Trainer() {
     }
 }
 
-/* use CFR starting with a predetermined random deal for a number of iterations */
+void Trainer::shuffle() {
+    std::shuffle(deck.begin(), deck.end(), rng);
+    for (int i = 0; i < NUM_HOLE_CARDS; ++i) deal[0][i] = deck[i];
+    for (int i = 0; i < NUM_STREET_CARDS; ++i) deal[1][i] = deck[i + NUM_HOLE_CARDS];
+}
+
 void Trainer::train(const unsigned int iterations) {
     this->iterations = iterations;
 
@@ -19,7 +24,6 @@ void Trainer::train(const unsigned int iterations) {
 }
 
 void Trainer::display_strats() const {
-    std::cout << "Average utility of the root node:\n" << (rootNodeUtil / iterations) << "\n\n";
     std::cout << "Node Strategies:\n";
 
     std::unordered_map<int, std::string> options { { 0b001, "check" }, { 0b010, "call" }, { 0b011, "raise" }, { 0b100, "fold" } };
@@ -52,12 +56,6 @@ void Trainer::display_strats() const {
 
         std::cout << " STRATEGY: ";
         for (int i = 0; i < node->num_actions(); ++i) std::cout << options[actions[i]] << ": " << strategy[i] << "  ";
-
-        // std::cout << " REGRETS: "; // TEST
-        // for (int i = 0; i < node->num_actions(); ++i) std::cout << node->cumul_regrets()[i] << "  "; // TEST
-        // std::cout << " STRATEGY: ";
-        // for (int i = 0; i < node->num_actions(); ++i) std::cout << options[actions[i]] << ": " << node->strategy()[i] << "  ";
-
         std::cout << "\n";
     }
     std::cout << "\n\nThis program was trained for " << iterations << " iterations." << "\n\n";
@@ -75,9 +73,7 @@ void Trainer::cont_explore(const std::vector<int>& holeCards, const std::vector<
 
     std::cout << "POT:  " << pot[curPlayer] + pot[!curPlayer] << "\n";
 
-    // if raise-call or check-check, fold
     if ((lastActions == 0b011010 || lastActions == 0b001001) && sinceChance > 1) {
-        // if (lastActions == 0b011010 || lastActions == 0b001001) {
         if (passedStreets < NUM_STREETS) {
             infoset <<= CARD_LEN;
             infoset ^= streetCards[passedStreets] + 1;
@@ -85,11 +81,9 @@ void Trainer::cont_explore(const std::vector<int>& holeCards, const std::vector<
             ++passedStreets;
         }
         else {
-            std::cout << "PLAYER 1 PAYOFF:  " << bot.terminal_util(curPlayer, pot, holeCards, streetCards, passedStreets) << "\n\n\n";
+            std::cout << "PLAYER 1 PAYOFF:  " << CFR::terminal_util(curPlayer, pot, holeCards, streetCards, passedStreets) << "\n\n\n";
             return;
         }
-
-        // return terminal_util(curPlayer, pot, holeCards, streetCards, passedStreets); // TEST
     }
     else if (lastAction == 0b100) {
         std::cout << "PLAYER 1 PAYOFF:  " << pot[!curPlayer] << "\n\n\n";
@@ -129,7 +123,6 @@ void Trainer::cont_explore(const std::vector<int>& holeCards, const std::vector<
     std::cout << "\n\n";
     while (!found) {
         std::cin >> actionStr;
-
         for (auto& i : options) {
             if (i.second == actionStr) {
                 action = i.first;
@@ -140,14 +133,7 @@ void Trainer::cont_explore(const std::vector<int>& holeCards, const std::vector<
     }
     std::cout << "\n";
 
-    int bet = 0;
-    if (action == 0b011) {
-        bet = 2 * (passedStreets + 1);
-        if (lastAction == 0b011) bet *= 2;
-    }
-    else if (action == 0b010) bet = pot[!curPlayer] - pot[curPlayer];
-    pot[curPlayer] += bet;
-
+    CFR::update_pot(pot, curPlayer, action, lastAction, passedStreets);
     cont_explore(holeCards, streetCards, pot, passedStreets, sinceChance, infoset ^ action, numPastActions + 1);
 }
 
@@ -157,11 +143,4 @@ void Trainer::explore() {
         std::vector<int> pot(2, 1);
         cont_explore(deal[0], deal[1], pot);
     }
-}
-
-// TODO: fisher-yates shuffle
-void Trainer::shuffle() {
-    std::shuffle(deck.begin(), deck.end(), rng);
-    for (int i = 0; i < NUM_HOLE_CARDS; ++i) deal[0][i] = deck[i];
-    for (int i = 0; i < NUM_STREET_CARDS; ++i) deal[1][i] = deck[i + NUM_HOLE_CARDS];
 }

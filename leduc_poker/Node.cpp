@@ -40,25 +40,6 @@ Node::~Node() {
     delete[] this->avgStrat;
 }
 
-double* Node::strategy() {
-    for (int i = 0; i < numActions; ++i) strat[i] = (cumulRegrets[i] > 0) ? cumulRegrets[i] : 0.0;
-    normalize(strat, numActions);
-    return strat;
-}
-
-void Node::update_sum(const unsigned int iteration, const double iterWeight) {
-    for (int i = 0; i < numActions; ++i) {
-        if (iteration > WARMUP) stratSum[i] += strat[i] * iterWeight;
-        // stratSum[i] += strat[i] * iterWeight;
-    }
-}
-
-double* Node::avg_strategy() {
-    for (int i = 0; i < numActions; ++i) avgStrat[i] = stratSum[i];
-    normalize(avgStrat, numActions);
-    return avgStrat;
-}
-
 void Node::normalize(double* arr, int n) {
     double sum = 0.0;
     for (int i = 0; i < n; ++i) sum += arr[i];
@@ -68,4 +49,22 @@ void Node::normalize(double* arr, int n) {
     else {
         for (int i = 0; i < n; ++i) arr[i] = 1.0 / n;
     }
+}
+
+void Node::update_sum(const unsigned int iteration, const double iterWeight) {
+    for (int i = 0; i < numActions; ++i) {
+        if (iteration > WARMUP) stratSum[i] += strat[i] * iterWeight;
+    }
+}
+
+double* Node::strategy() {
+    for (int i = 0; i < numActions; ++i) strat[i] = (cumulRegrets[i] > 0) ? cumulRegrets[i] : 0.0;
+    normalize(strat, numActions);
+    return strat;
+}
+
+double* Node::avg_strategy() const {
+    for (int i = 0; i < numActions; ++i) avgStrat[i] = stratSum[i];
+    normalize(avgStrat, numActions);
+    return avgStrat;
 }

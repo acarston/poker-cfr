@@ -105,5 +105,3 @@ int CFR::terminal_util(const int curPlayer, std::vector<int>& pot, const std::ve
     }
     return (playerCard == oppCard) ? 0 : (playerCard > oppCard) ? pot[!curPlayer] : -pot[curPlayer];
 }
-
-
