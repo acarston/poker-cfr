@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{b320740c-9b92-47bb-a6fe-2ff7f7b264b8}</ProjectGuid>
-    <RootNamespace>testproj</RootNamespace>
+    <ProjectGuid>{72e4ab43-286c-4fbd-bd77-612c03a6cc46}</ProjectGuid>
+    <RootNamespace>leducpokerv2</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,11 +127,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\kuhn_poker_v2\CFR.cpp" />
-    <ClCompile Include="..\kuhn_poker_v2\main.cpp" />
-    <ClCompile Include="..\kuhn_poker_v2\Node.cpp" />
-    <ClCompile Include="..\kuhn_poker_v2\Trainer.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClInclude Include="..\leduc_poker\CFR.h" />
+    <ClInclude Include="..\leduc_poker\Node.h" />
+    <ClInclude Include="..\leduc_poker\Trainer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\leduc_poker\CFR.cpp" />
+    <ClCompile Include="..\leduc_poker\main.cpp" />
+    <ClCompile Include="..\leduc_poker\Node.cpp" />
+    <ClCompile Include="..\leduc_poker\Trainer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

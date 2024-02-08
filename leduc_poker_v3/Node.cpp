@@ -1,7 +1,24 @@
 #include "Node.h"
 
-Node::Node() {
-    this->numActions = 2;
+Node::Node(const int lastActions, const int lastAction, const int passedStreets) {
+    this->passedStreets = passedStreets;
+
+    const int firstAction = lastActions >> 3;
+    if (lastActions == 0 || lastAction == 0b001 || lastAction == 0b010) {
+        this->numActions = 2;
+        this->actions = new int[numActions] { 0b001, 0b011 };
+    }
+    else if (lastAction == 0b011) {
+        if (firstAction == 0 || firstAction == 0b001) {
+            this->numActions = 2;
+            this->actions = new int[numActions] { 0b100, 0b010 };
+        }
+        else if (firstAction == 0b011) {
+            this->numActions = 2;
+            this->actions = new int[numActions] { 0b100, 0b010 };
+        }
+    }
+
     this->strat = new double[this->numActions];
     this->stratSum = new double[this->numActions];
     this->cumulRegrets = new double[this->numActions];
@@ -16,6 +33,7 @@ Node::Node() {
 }
 
 Node::~Node() {
+    delete[] this->actions;
     delete[] this->cumulRegrets;
     delete[] this->strat;
     delete[] this->stratSum;
@@ -31,6 +49,7 @@ double* Node::strategy() {
 void Node::update_sum(const unsigned int iteration, const double iterWeight) {
     for (int i = 0; i < numActions; ++i) {
         if (iteration > WARMUP) stratSum[i] += strat[i] * iterWeight;
+        // stratSum[i] += strat[i] * iterWeight;
     }
 }
 

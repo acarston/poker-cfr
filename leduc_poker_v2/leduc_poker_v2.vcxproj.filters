@@ -15,19 +15,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClInclude Include="..\leduc_poker\Trainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\leduc_poker\Node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\leduc_poker\CFR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\leduc_poker\Trainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\kuhn_poker_v2\Trainer.cpp">
+    <ClCompile Include="..\leduc_poker\Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\kuhn_poker_v2\Node.cpp">
+    <ClCompile Include="..\leduc_poker\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\kuhn_poker_v2\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\kuhn_poker_v2\CFR.cpp">
+    <ClCompile Include="..\leduc_poker\CFR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

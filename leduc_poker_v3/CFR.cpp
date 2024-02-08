@@ -4,26 +4,26 @@
 // TODO: remove 'bet' from pass-in
 double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const std::vector<int>& holeCards, const std::vector<int>& streetCards, std::vector<int> pot, const int lastBet, int passedStreets, int sinceChance, int infoset, int numPastActions) {
     const int curPlayer = (numPastActions % 2 == 0) ? 0 : 1;
-    const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset& (0b1 << sinceChance * ACTION_LEN) - 1;
+    const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset & (0b1 << sinceChance * ACTION_LEN) - 1;
     const int lastAction = lastActions & 0b111;
 
     for (int i = 0; i < passedStreets; ++i) {
         infoset <<= CARD_LEN;
         infoset ^= streetCards[i] + 1;
     }
-    
-    // if raise-call or check-check, fold
-    if ((lastActions == 0b011010 || lastActions == 0b001001) && sinceChance > 1) {
-    // if (lastActions == 0b011010 || lastActions == 0b001001) {
-        if (passedStreets < NUM_STREETS) {
-            infoset <<= CARD_LEN;
-            infoset ^= streetCards[passedStreets] + 1;
-            sinceChance = 0;
-            ++passedStreets;
-        }
-        else return terminal_util(curPlayer, pot, holeCards, streetCards, passedStreets);
 
-        // return terminal_util(curPlayer, pot, holeCards, streetCards, passedStreets); // TEST
+    // if raise-call or check-check, fold
+    //if ((lastActions == 0b011010 || lastActions == 0b001001) && sinceChance > 1) {
+    if (lastActions == 0b011010 || lastActions == 0b001001) {
+        //if (passedStreets < NUM_STREETS) {
+        //    infoset <<= CARD_LEN;
+        //    infoset ^= streetCards[passedStreets] + 1;
+        //    sinceChance = 0;
+        //    ++passedStreets;
+        //}
+        //else return terminal_util(curPlayer, pot, holeCards, streetCards, passedStreets);
+
+        return terminal_util(curPlayer, pot, holeCards, streetCards, passedStreets); // TEST
     }
     else if (lastAction == 0b100) return pot[!curPlayer];
     ++sinceChance;
@@ -56,8 +56,8 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
         // TODO: make block a function
         int bet = 0;
         if (action == 0b011) {
-            bet = 2 * (passedStreets + 1);
-            if (lastAction == 0b011) bet *= 2;
+            bet = 1 * (passedStreets + 1);
+            // if (lastAction == 0b011) bet *= 2;
         }
         else if (action == 0b010) bet = pot[!curPlayer] - pot[curPlayer];
         pot[curPlayer] += bet;
@@ -72,8 +72,8 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
 
         int bet = 0;
         if (action == 0b011) {
-            bet = 2 * (passedStreets + 1);
-            if (lastAction == 0b011) bet *= 2;
+            bet = 1 * (passedStreets + 1);
+            // if (lastAction == 0b011) bet *= 2;
         }
         else if (action == 0b010) bet = pot[!curPlayer] - pot[curPlayer];
         pot[curPlayer] += bet;
@@ -95,7 +95,7 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     return nodeUtil;
 }
 
-int CFR::terminal_util(const int curPlayer, std::vector<int>& pot, const std::vector<int>& holeCards, const std::vector<int>& streetCards, int passedStreets) {
+int CFR::terminal_util(const int curPlayer, std::vector<int>& pot, const std::vector<int>& holeCards, const std::vector<int>& streetCards, int passedStreets) const {
     int playerCard = holeCards[curPlayer], oppCard = holeCards[!curPlayer];
     if (passedStreets) {
         for (int streetCard : streetCards) {
@@ -105,3 +105,5 @@ int CFR::terminal_util(const int curPlayer, std::vector<int>& pot, const std::ve
     }
     return (playerCard == oppCard) ? 0 : (playerCard > oppCard) ? pot[!curPlayer] : -pot[curPlayer];
 }
+
+

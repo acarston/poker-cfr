@@ -48,8 +48,8 @@ double* Node::strategy() {
 
 void Node::update_sum(const unsigned int iteration, const double iterWeight) {
     for (int i = 0; i < numActions; ++i) {
-        // if (iteration > WARMUP) stratSum[i] += strat[i] * iterWeight;
-        stratSum[i] += strat[i] * iterWeight;
+        if (iteration > WARMUP) stratSum[i] += strat[i] * iterWeight;
+        // stratSum[i] += strat[i] * iterWeight;
     }
 }
 
