@@ -1,5 +1,43 @@
 #include "CFR.h"
 
+int CFR::rank_hand(Card* cards) {
+    const int handSize = 5;
+
+    bool flush = true;
+    bool straight = true;
+
+    std::sort(cards, cards + handSize, [](Card& a, Card& b) { return a > b; });
+    for (int i = 0; i < handSize - 1; ++i) {
+        if (cards[0].suit != cards[i + 1].suit) flush = false;
+        if (cards[i] - cards[i + 1] != 1) straight = false;
+        if (!flush && !straight) break;
+    }
+    if (cards[0] == 14 && cards[1] == 5 && cards[2] == 4 && cards[3] == 3 && cards[4] == 2) straight = true;
+
+    int frequencies[handSize]{};
+    int kind = 1;
+    for (int i = 0; i < handSize - 1; ++i) {
+        if (cards[i] == cards[i + 1]) ++kind;
+        else {
+            ++frequencies[kind];
+            kind = 1;
+        }
+    }
+    ++frequencies[kind];
+
+    if (flush && straight) return 8;
+    if (frequencies[4]) return 7;
+    if (frequencies[3] && frequencies[2]) return 6;
+    if (flush) return 5;
+    if (straight) return 4;
+    if (frequencies[3]) return 3;
+    if (frequencies[2] > 1) return 2;
+    if (frequencies[2]) return 1;
+    return 0;
+}
+
+// int CFR::terminal_util(const int curPlayer, std::vector<int>& pot, const std::vector<std::vector<Card>>& holeCards)
+
 int CFR::terminal_util(const int curPlayer, std::vector<int>& pot, const std::vector<int>& holeCards, const std::vector<int>& streetCards, int passedStreets) {
     int playerCard = holeCards[curPlayer], oppCard = holeCards[!curPlayer];
     if (passedStreets) {
@@ -12,17 +50,17 @@ int CFR::terminal_util(const int curPlayer, std::vector<int>& pot, const std::ve
 }
 
 int CFR::update_pot(std::vector<int>& pot, const int curPlayer, const int action, const int lastAction, const int passedStreets) {
-    int bet = 0;
+    if (!(action == 0b010 || action == 0b011)) return 0;
+
+    int bet = pot[!curPlayer] - pot[curPlayer];
     if (action == 0b011) {
-        bet = 2 * (passedStreets + 1);
-        if (lastAction == 0b011) bet *= 2;
+        if (passedStreets < 2) bet += 2;
+        else bet += 4;
     }
-    else if (action == 0b010) bet = pot[!curPlayer] - pot[curPlayer];
     pot[curPlayer] += bet;
     return bet;
 }
 
-// TODO: reorganize variable placements to make more sense
 double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const std::vector<int>& holeCards, const std::vector<int>& streetCards, std::vector<int> pot, int passedStreets, int sinceChance, int infoset, int numPastActions) {
     const int curPlayer = (numPastActions % 2 == 0) ? 0 : 1;
     const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset & (0b1 << sinceChance * ACTION_LEN) - 1;
@@ -61,15 +99,15 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     const double* nodeStrat = node->strategy();
     const int numActions = node->num_actions();
     const int* actions = node->get_actions();
-
     const double iterWeight = double(iteration) / (iteration + 1000000);
-    node->update_sum(iteration, iterWeight);
 
     // remove hole cards and street cards; prepare for next action
     infoset >>= passedStreets * CARD_LEN + CARD_LEN;
     infoset <<= ACTION_LEN;
 
     if (curPlayer != targetPlayer) {
+        node->update_sum(iteration, iterWeight);
+
         // sample a random action based on the current strategy
         std::discrete_distribution<int> dist(nodeStrat, nodeStrat + numActions);
         const int action = actions[dist(this->rng)];

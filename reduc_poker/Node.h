@@ -12,7 +12,7 @@ private:
 	double* stratSum = nullptr;
 	double* avgStrat = nullptr;
 
-	const static int WARMUP = 100000;
+	const static int WARMUP = 1000;
 
 	static void normalize(double* arr, int n);
 

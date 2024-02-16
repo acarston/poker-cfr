@@ -22,7 +22,6 @@ int CFR::update_pot(std::vector<int>& pot, const int curPlayer, const int action
     return bet;
 }
 
-// TODO: reorganize variable placements to make more sense
 double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const std::vector<int>& holeCards, const std::vector<int>& streetCards, std::vector<int> pot, int passedStreets, int sinceChance, int infoset, int numPastActions) {
     const int curPlayer = (numPastActions % 2 == 0) ? 0 : 1;
     const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset & (0b1 << sinceChance * ACTION_LEN) - 1;
@@ -61,15 +60,15 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const st
     const double* nodeStrat = node->strategy();
     const int numActions = node->num_actions();
     const int* actions = node->get_actions();
-
     const double iterWeight = double(iteration) / (iteration + 1000000);
-    node->update_sum(iteration, iterWeight);
 
     // remove hole cards and street cards; prepare for next action
     infoset >>= passedStreets * CARD_LEN + CARD_LEN;
     infoset <<= ACTION_LEN;
 
     if (curPlayer != targetPlayer) {
+        node->update_sum(iteration, iterWeight);
+
         // sample a random action based on the current strategy
         std::discrete_distribution<int> dist(nodeStrat, nodeStrat + numActions);
         const int action = actions[dist(this->rng)];

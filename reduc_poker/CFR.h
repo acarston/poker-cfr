@@ -5,13 +5,16 @@
 #include <string>
 #include <random>
 #include <unordered_map>
+#include <algorithm>
 
 #include "Node.h"
+#include "Card.h"
 
 class CFR {
 private:
 	const int NUM_STREETS = 1;
 	const int CARD_LEN = 2;
+	const int NUM_PLAYERS = 2;
 	const int ACTION_LEN = 3;
 
 	std::random_device dev;
@@ -19,7 +22,8 @@ private:
 
 public:
 	std::unordered_map<int, Node*> nodes;
-
+	
+	static int rank_hand(Card* cards);
 	static int terminal_util(const int curPlayer, std::vector<int>& pot, const std::vector<int>& holeCards, const std::vector<int>& streetCards, int passedStreets);
 	static int update_pot(std::vector<int>& pot, const int curPlayer, const int action, const int lastAction, const int passedStreets);
 
