@@ -12,9 +12,10 @@
 #include <queue>
 
 struct Card {
-	int rank;
-	int suit;
+	int rank = 0;
+	int suit = 0;
 
+	Card() {};
 	Card(const int rank, const int suit) : rank(rank), suit(suit) {};
 
 	bool operator>(const Card& other) const { return this->rank > other.rank; }
@@ -23,6 +24,46 @@ struct Card {
 	bool operator==(const int rank) const { return this->rank == rank; }
 	bool operator!=(const Card& other) const { return !(*this == other); }
 	int operator-(const Card& other) const { return this->rank - other.rank; }
+	Card& operator++() { ++this->rank; return *this; }
+};
+
+class BoardPermutation : std::iterator<std::input_iterator_tag, Card**> {
+private:
+	Card** board = nullptr;
+	bool done = false;
+	const int HAND_SIZE = 5;
+	const int LAST_IDX = 4;
+	int i = LAST_IDX;
+	int j = LAST_IDX;
+
+public:
+	BoardPermutation(Card** board) : board(board) {};
+
+	explicit operator bool() const { return !done; }
+	reference operator*() { return board; }
+
+	BoardPermutation& operator++() {
+		if (i < 0 && j < 0) done = true;
+
+		else if (j <= i || i == LAST_IDX) {
+			std::swap(board[i], board[HAND_SIZE]);
+			j = HAND_SIZE - 1;
+			--i;
+		}
+
+		else {
+			std::swap(board[j], board[HAND_SIZE + 1]);
+			--j;
+		}
+
+		return *this;
+	}
+
+	BoardPermutation operator++(int) {
+		BoardPermutation copy(*this);
+		++*this;
+		return copy;
+	}
 };
 
 void clear_queue(std::queue<Card*>& q) {
@@ -33,28 +74,75 @@ void clear_queue(std::queue<Card*>& q) {
 void shuffle(Card** deck, Card*** deal, Card*** boards, std::mt19937& rng) {
 	const int NUM_HOLE_CARDS = 2, NUM_PLAYERS = 2, NUM_STREET_CARDS = 5;
 
+	// TODO: fisher-yates partial shuffle instead
 	std::shuffle(deck, deck + 52, rng);
 	int dealt = 0;
+
+	std::vector<std::vector<Card*>> test(2, std::vector<Card*>(7));
+	Card* test2 = boards[0][1];
+	Card* test3 = deal[0][1];
+
+	//test
+	std::cout << std::endl;
 
 	for (int i = 0; i < NUM_PLAYERS; ++i) {
 		for (int j = 0; j < NUM_HOLE_CARDS; ++j, ++dealt) {
 			Card* card = deck[dealt];
 			deal[i][j] = card;
 			boards[i][j] = card;
+
+			test2 = boards[0][1];
+			test3 = deal[0][1];
+
+			test[i][j] = card;
+
+			std::cout << "(" << boards[i][j]->rank << ", " << boards[i][j]->suit << ")";
+			std::cout << "(" << test[i][j]->rank << ", " << test[i][j]->suit << ")";
+
+			//test 
+			/*for (int k = 0; k < j + 1; ++k) std::cout << "(" << boards[i][k]->rank << ", " << boards[i][k]->suit << ")";
+			std::cout << std::endl;*/
 		}
 	}
+	//test
+	std::cout << std::endl;
+	std::cout << "(" << boards[0][1]->rank << ", " << boards[0][1]->suit << ")";
+	std::cout << "(" << boards[1][0]->rank << ", " << boards[1][0]->suit << ")";
+	std::cout << std::endl;
+
+	//test
+	for (int i = 0; i < NUM_PLAYERS; ++i) {
+		for (int j = 0; j < 2; ++j) {
+			std::cout << "(" << boards[i][j]->rank << ", " << boards[i][j]->suit << ")";
+			std::cout << "(" << test[i][j]->rank << ", " << test[i][j]->suit << ")";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
 
 	for (int i = 0; i < NUM_STREET_CARDS; ++i, ++dealt) {
 		Card* card = deck[dealt];
 		deal[NUM_PLAYERS][i] = card;
-		for (int j = 0; j < NUM_PLAYERS; ++j) boards[j][NUM_HOLE_CARDS + i] = card;
+		for (int j = 0; j < NUM_PLAYERS; ++j) {
+			boards[j][NUM_HOLE_CARDS + i] = card;
+			test[j][NUM_HOLE_CARDS + i] = card;
+		}
 	}
+
+	//test
+	for (int i = 0; i < NUM_PLAYERS; ++i) {
+		for (int j = 0; j < 7; ++j) {
+			std::cout << "(" << boards[i][j]->rank << ", " << boards[i][j]->suit << ")";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
 }
 
 int compare_hands(Card** hand1, Card** hand2) {
 	for (int i = 0; i < 5; ++i) {
-		if (hand1[i] == hand2[i]) continue;
-		return (hand1[i] > hand2[i]) ? 0 : 1;
+		if (*hand1[i] == *hand2[i]) continue;
+		return (*hand1[i] > *hand2[i]) ? 1 : 0;
 	}
 	return -1;
 }
@@ -80,7 +168,6 @@ int rank_hand(Card** cards) {
 	std::queue<std::queue<Card*>> frequencies[handSize]{};
 	std::queue<Card*> tmpQueue;
 	for (int i = 0; i < handSize - 1; ++i) {
-		std::cout << "CARDS: " << cards[i]->rank << " " << cards[i + 1]->rank << std::endl;
 		if (*cards[i] == *cards[i + 1]) tmpQueue.push(cards[i]);
 		else {
 			tmpQueue.push(cards[i]);
@@ -98,7 +185,7 @@ int rank_hand(Card** cards) {
 	else if (flush) rank = 6;
 	else if (straight) rank = 5;
 	else if (!frequencies[3].empty()) rank = 4;
-	else if (!frequencies[2].size() > 1) rank = 3;
+	else if (frequencies[2].size() > 1) rank = 3;
 	else if (!frequencies[2].empty()) rank = 2;
 
 	int cardsIdx = 0;
@@ -127,21 +214,27 @@ int terminal_util(const int curPlayer, int* pot, Card*** boards) {
 
 	int bestRank[NUM_PLAYERS]{};
 	Card* bestHand[NUM_PLAYERS][HAND_SIZE]{};
+	Card* curHand[HAND_SIZE];
 	for (int i = 0; i < NUM_PLAYERS; ++i) {
-		do {
+		BoardPermutation permutation(boards[i]);
+
+		while (permutation) {
+			std::copy(boards[i], boards[i] + HAND_SIZE, curHand);
+
 			std::cout << "PERMUTATION:  ";
 			for (int j = 0; j < 7; ++j) {
 				std::cout << (boards[i][j])->rank << " ";
 			}
-			std::cout << std::endl;
+			std::cout << "PLAYER:  " << i << std::endl;
 
-			int rank = rank_hand(boards[i]);
-			if (rank > bestRank[i] || (rank == bestRank[i] && compare_hands(boards[i], bestHand[i]) == 1)) {
+			int rank = rank_hand(curHand);
+			if (rank > bestRank[i] || (rank == bestRank[i] && compare_hands(curHand, bestHand[i]) == 1)) {
 				bestRank[i] = rank;
-				std::copy(boards[i], boards[i] + HAND_SIZE, bestHand[i]);
+				std::copy(curHand, curHand + HAND_SIZE, bestHand[i]);
 			}
-			std::sort(boards[i], boards[i] + 7, [](const Card* a, const Card* b) { return *a < *b; }); // REMOVE
-		} while (std::next_permutation(boards[i], boards[i] + 7, [](const Card* a, const Card* b) { return *a < *b; }));
+
+			++permutation;
+		}
 	}
 
 	for (int i = 0; i < NUM_PLAYERS; ++i) {
@@ -152,8 +245,8 @@ int terminal_util(const int curPlayer, int* pot, Card*** boards) {
 		std::cout << std::endl;
 	}
 
-	if (bestRank[0] != bestRank[1]) return (bestRank[0] > bestRank[1]) ? pot[!curPlayer] : -pot[curPlayer];
-	int curPlayerBetter = compare_hands(bestHand[0], bestHand[1]);
+	if (bestRank[curPlayer] != bestRank[!curPlayer]) return (bestRank[curPlayer] > bestRank[!curPlayer]) ? pot[!curPlayer] : -pot[curPlayer];
+	int curPlayerBetter = compare_hands(bestHand[curPlayer], bestHand[!curPlayer]);
 	return (curPlayerBetter == 1) ? pot[!curPlayer] : (curPlayerBetter == 0) ? -pot[curPlayer] : 0;
 }
 
@@ -222,108 +315,155 @@ int terminal_util(const int curPlayer, int* pot, Card*** boards) {
 //  for (int i = 0; i < NUM_PLAYERS; ++i) boards[i] = new Card * [BOARD_SIZE];
 //}
 
+int main() {
+	std::random_device dev;
+	std::mt19937 rng{ dev() };
+
+	const int SUITS = 4;
+	const int RANKS = 13;
+	constexpr int NUM_CARDS = SUITS * RANKS;
+	const int NUM_PLAYERS = 2;
+	const int NUM_HOLE_CARDS = 2;
+	const int NUM_STREET_CARDS = 5;
+	constexpr int BOARD_SIZE = NUM_HOLE_CARDS + NUM_STREET_CARDS;
+
+	Card objDeck[NUM_CARDS];
+	Card* deck[NUM_CARDS];
+
+	for (int i = 0; i < SUITS; ++i) {
+		for (int j = 0; j < RANKS; ++j) {
+			const int idx = i * RANKS + j;
+			objDeck[idx].rank = j + 2;
+			objDeck[idx].suit = i;
+		}
+	}
+	for (int i = 0; i < NUM_CARDS; ++i) deck[i] = &objDeck[i];
+
+	for (Card* card : deck) {
+		std::cout << "(" << card->rank << ", " << card->suit << ") " << "\n";
+	}
+
+	Card** deal[NUM_PLAYERS + 1];
+	for (int i = 0; i < NUM_PLAYERS; ++i) deal[i] = new Card*[NUM_HOLE_CARDS];
+	deal[NUM_PLAYERS] = new Card*[NUM_STREET_CARDS];
+
+	//Card objBoards[NUM_PLAYERS][BOARD_SIZE];
+	//Card* boards[NUM_PLAYERS][BOARD_SIZE];
+
+	//for (int i = 0; i < NUM_PLAYERS; ++i) {
+	//	for (int j = 0; j < BOARD_SIZE; ++j) {
+	//		boards[i][j] = &objBoards[i][j];
+	//	}
+	//}
+
+	Card** boards[NUM_PLAYERS];
+	for (int i = 0; i < NUM_PLAYERS; ++i) boards[i] = new Card*[7];
+
+	shuffle(deck, deal, (Card***)boards, rng);
+
+	std::cout << "Dealt Cards:" << std::endl;
+	for (int i = 0; i < NUM_PLAYERS; ++i) {
+		std::cout << "Player " << i + 1 << ": ";
+		for (int j = 0; j < NUM_HOLE_CARDS; ++j) {
+			std::cout << "(" << deal[i][j]->rank << ", " << deal[i][j]->suit << ") ";
+		}
+		std::cout << std::endl;
+	}
+
+	std::cout << "Board Cards:" << std::endl;
+	for (int i = 0; i < NUM_STREET_CARDS; ++i) {
+		std::cout << "(" << deal[NUM_PLAYERS][i]->rank << ", " << deal[NUM_PLAYERS][i]->suit << ") ";
+	}
+	std::cout << std::endl << std::endl;
+
+	int pot[NUM_PLAYERS] = { 100, 100 };
+	int curPlayer = 0;
+	int result = terminal_util(curPlayer, pot, (Card***)boards);
+	std::cout << "Result: " << result << std::endl;
+}
+
 //int main() {
-//	std::random_device dev;
-//	std::mt19937 rng{ dev() };
+//	Card* hand1[]{ new Card(7, 3), new Card(7, 1), new Card(13, 0), new Card(11, 0), new Card(3, 3) };
+//	Card* hand2[]{ new Card(7, 3), new Card(7, 1), new Card(11, 3), new Card(10, 2), new Card(6, 3) };
+//	int test = compare_hands(hand1, hand2);
+//	std::cout << test << std::endl;
+//}
+
+
+
+//#include <iostream>
+//#include <vector>
 //
-//	const int SUITS = 4;
-//	const int RANKS = 13;
-//	constexpr int NUM_CARDS = SUITS * RANKS;
-//	const int NUM_PLAYERS = 2;
-//	const int NUM_HOLE_CARDS = 2;
-//	const int NUM_STREET_CARDS = 5;
-//	constexpr int BOARD_SIZE = NUM_HOLE_CARDS + NUM_STREET_CARDS;
+//using namespace std;
 //
-//	Card* deck[NUM_CARDS];
-//	for (int i = 0; i < SUITS; ++i) {
-//		for (int j = 0; j < RANKS; ++j) deck[i * RANKS + j] = new Card(j + 2, i);
-//	}
-//
-//	for (Card* card : deck) {
-//		std::cout << "(" << card->rank << ", " << card->suit << ") " << "\n";
-//	}
-//
-//	Card** deal[NUM_PLAYERS + 1];
-//	for (int i = 0; i < NUM_PLAYERS; ++i) deal[i] = new Card*[NUM_HOLE_CARDS];
-//	deal[NUM_PLAYERS] = new Card*[NUM_STREET_CARDS];
-//
-//	Card** boards[NUM_PLAYERS];
-//	for (int i = 0; i < NUM_PLAYERS; ++i) boards[i] = new Card*[BOARD_SIZE];
-//
-//	shuffle(deck, deal, boards, rng);
-//
-//	std::cout << "Dealt Cards:" << std::endl;
-//	for (int i = 0; i < NUM_PLAYERS; ++i) {
-//		std::cout << "Player " << i + 1 << ": ";
-//		for (int j = 0; j < NUM_HOLE_CARDS; ++j) {
-//			std::cout << "(" << deal[i][j]->rank << ", " << deal[i][j]->suit << ") ";
-//		}
-//		std::cout << std::endl;
-//	}
-//
-//	std::cout << "Board Cards:" << std::endl;
-//	for (int i = 0; i < NUM_STREET_CARDS; ++i) {
-//		std::cout << "(" << deal[NUM_PLAYERS][i]->rank << ", " << deal[NUM_PLAYERS][i]->suit << ") ";
-//	}
+//void printVec(const vector<int>& v) {
+//	for (const int el : v) std::cout << el << " ";
 //	std::cout << std::endl;
+//}
 //
-//	int pot[NUM_PLAYERS] = { 100, 100 };
-//	int curPlayer = 0;
-//	int result = terminal_util(curPlayer, pot, boards);
-//	std::cout << "Result: " << result << std::endl;
+//void printCombos(vector<int>& elements) {
+//	const int r = 5;
+//
+//	printVec(elements);
+//	for (int i = r - 1; i >= 0; --i) {
+//		std::swap(elements[i], elements[r]);
+//		printVec(elements);
+//		for (int j = r - 1; j >= i; --j) {
+//			std::swap(elements[j], elements[r + 1]);
+//			printVec(elements);
+//		}
+//	}
+//}
+//
+//// Function to generate combinations using a loop
+//void generateCombinations(vector<int>& elements) {
+//	int n = elements.size();
+//	int k = 5;
+//
+//	// Initialize combination with first k elements
+//	vector<int> combination(k);
+//	for (int i = 0; i < k; ++i) {
+//		combination[i] = elements[i];
+//	}
+//
+//	while (true) {
+//		// Print the combination
+//		for (int num : combination) {
+//			cout << num << " ";
+//		}
+//		cout << endl;
+//
+//		// Find the first index j such that elements[j] is not at its maximum value
+//		int j = k - 1;
+//		while (j >= 0 && combination[j] == elements[n - k + j]) {
+//			j--;
+//		}
+//
+//		// If no such index exists, we're done
+//		if (j < 0) {
+//			break;
+//		}
+//
+//		// Increment combination[j], and set all subsequent elements to the next value after combination[j]
+//		combination[j]++;
+//		for (int l = j + 1; l < k; ++l) {
+//			combination[l] = combination[l - 1] + 1;
+//		}
+//	}
+//}
+//
+//int main() {
+//	vector<int> elements = { 2,3,5,9,10,12,14 };
+//	Card* els[] = { new Card(2, 0), new Card(3, 0),new Card(5, 0),new Card(9, 0),new Card(10, 0),new Card(12, 0),new Card(14, 0) };
+//	// elements = { 1, 2, 3, 4, 5, 6, 7 };
+//
+//	printCombos(elements);
+//	std::cout << std::endl << std::endl;
+//	BoardPermutation perm(els);
+//	while (perm) {
+//		++perm;
+//	}
 //
 //	return 0;
 //}
-
-class 
-
-#include <iostream>
-#include <vector>
-
-using namespace std;
-
-// Function to generate combinations using a loop
-void generateCombinations(vector<int>& elements) {
-	int n = elements.size();
-	int k = 5;
-
-	// Initialize combination with first k elements
-	vector<int> combination(k);
-	for (int i = 0; i < k; ++i) {
-		combination[i] = elements[i];
-	}
-
-	while (true) {
-		// Print the combination
-		for (int num : combination) {
-			cout << num << " ";
-		}
-		cout << endl;
-
-		// Find the first index j such that elements[j] is not at its maximum value
-		int j = k - 1;
-		while (j >= 0 && combination[j] == elements[n - k + j]) {
-			j--;
-		}
-
-		// If no such index exists, we're done
-		if (j < 0) {
-			break;
-		}
-
-		// Increment combination[j], and set all subsequent elements to the next value after combination[j]
-		combination[j]++;
-		for (int l = j + 1; l < k; ++l) {
-			combination[l] = combination[l - 1] + 1;
-		}
-	}
-}
-
-int main() {
-	vector<int> elements = { 1, 2, 3, 4, 5, 6, 7 };
-
-	generateCombinations(elements);
-
-	return 0;
-}
 
