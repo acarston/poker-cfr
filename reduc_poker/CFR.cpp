@@ -62,7 +62,7 @@ int CFR::update_pot(std::vector<int>& pot, const int curPlayer, const int action
 }
 
 double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const std::vector<int>& holeCards, const std::vector<int>& streetCards, std::vector<int> pot, int passedStreets, int sinceChance, int infoset, int numPastActions) {
-    const int curPlayer = (numPastActions % 2 == 0) ? 0 : 1;
+    const int curPlayer = (numPastActions % 2 == 0) ? 0 : 1; // WRONG
     const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset & (0b1 << sinceChance * ACTION_LEN) - 1;
     const int lastAction = lastActions & 0b111;
 

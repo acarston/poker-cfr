@@ -1,15 +1,54 @@
 #include "Trainer.h"
 
 Trainer::Trainer() {
-    for (int i = 0; i < DECK_SIZE; ++i) {
-        for (int j = 0; j < DECK_REPEATS; ++j) this->deck.push_back(i);
+    for (int i = 0; i < SUITS; ++i) {
+        for (int j = 0; j < RANKS; ++j) {
+            const int idx = i * RANKS + j;
+            objDeck[idx].rank = j + 2;
+            objDeck[idx].suit = i;
+        }
     }
+    for (int i = 0; i < NUM_CARDS; ++i) deck[i] = &objDeck[i];
+
+    for (int i = 0; i < NUM_PLAYERS; ++i) {
+        deal[i] = new Card*[NUM_HOLE_CARDS];
+        boards[i] = new Card*[BOARD_SIZE];
+    }
+    deal[NUM_PLAYERS] = new Card*[NUM_STREET_CARDS];
 }
 
+Trainer::~Trainer() {
+    for (int i = 0; i < NUM_PLAYERS; ++i) {
+        delete[] deal[i];
+        delete[] boards[i];
+    }
+    delete[] deal[NUM_PLAYERS];
+}
+
+//void Trainer::shuffle() {
+//    std::shuffle(deck.begin(), deck.end(), rng);
+//    for (int i = 0; i < NUM_HOLE_CARDS; ++i) deal[0][i] = deck[i];
+//    for (int i = 0; i < NUM_STREET_CARDS; ++i) deal[1][i] = deck[i + NUM_HOLE_CARDS];
+//}
+
 void Trainer::shuffle() {
-    std::shuffle(deck.begin(), deck.end(), rng);
-    for (int i = 0; i < NUM_HOLE_CARDS; ++i) deal[0][i] = deck[i];
-    for (int i = 0; i < NUM_STREET_CARDS; ++i) deal[1][i] = deck[i + NUM_HOLE_CARDS];
+    // TODO: fisher-yates partial shuffle instead
+    std::shuffle(deck, deck + 52, rng);
+    int dealt = 0;
+
+    for (int i = 0; i < NUM_PLAYERS; ++i) {
+        for (int j = 0; j < NUM_HOLE_CARDS; ++j, ++dealt) {
+            Card* card = deck[dealt];
+            deal[i][j] = card;
+            boards[i][j] = card;
+        }
+    }
+
+    for (int i = 0; i < NUM_STREET_CARDS; ++i, ++dealt) {
+        Card* card = deck[dealt];
+        deal[NUM_PLAYERS][i] = card;
+        for (int j = 0; j < NUM_PLAYERS; ++j) boards[j][NUM_HOLE_CARDS + i] = card;
+    }
 }
 
 void Trainer::train(const unsigned int iterations) {

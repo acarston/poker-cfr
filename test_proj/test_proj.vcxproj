@@ -127,10 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\kuhn_poker_v2\CFR.cpp" />
     <ClCompile Include="..\kuhn_poker_v2\main.cpp" />
-    <ClCompile Include="..\kuhn_poker_v2\Node.cpp" />
-    <ClCompile Include="..\kuhn_poker_v2\Trainer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
