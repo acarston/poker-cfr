@@ -18,9 +18,7 @@ private:
     const static int NUM_HOLE_CARDS = 2;
     const static int NUM_STREET_CARDS = 5;
     const static int BOARD_SIZE = NUM_HOLE_CARDS + NUM_STREET_CARDS;
-    // const int DECK_SIZE = 3;
-    // const int DECK_REPEATS = 2;
-    const static int CARD_LEN = 2;
+    const static int CARD_LEN = 6;
     const static int ACTION_LEN = 3;
     const static int NUM_STREETS = 3;
     const static int SUITS = 4;
@@ -37,9 +35,6 @@ private:
     Card** deal[NUM_PLAYERS + 1];
     Card** boards[NUM_PLAYERS];
 
-    // std::vector<int> deck;
-    // std::vector<std::vector<int>> deal{ { 0, 0 }, { 0 } };
-
     void shuffle();
 
 public:
@@ -48,7 +43,7 @@ public:
 
     void train(const unsigned int iterations);
     void display_strats() const;
-    void cont_explore(const std::vector<int>& holeCards, const std::vector<int>& streetCards, std::vector<int> pot, int passedStreets = 0, int sinceChance = 0, int infoset = 0, int numPastActions = 0);
+    void cont_explore(const Card*** const deal, Card*** const boards, int* const pot, int passedStreets = 0, int sinceChance = 0, int infoset = 0, int numPastActions = 0);
     void explore();
 };
 

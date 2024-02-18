@@ -4,9 +4,11 @@
 struct Card {
 	int rank = 0;
 	int suit = 0;
+	int id = 0;
 
 	Card() {};
-	Card(const int rank, const int suit) : rank(rank), suit(suit) {};
+	// TODO: make into suit * rank
+	Card(const int rank, const int suit) : rank(rank), suit(suit) { this->id = (suit + 1) * (rank - 1); };
 
 	bool operator>(const Card& other) const { return this->rank > other.rank; }
 	bool operator<(const Card& other) const { return this->rank < other.rank; }

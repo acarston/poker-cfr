@@ -25,15 +25,9 @@ Trainer::~Trainer() {
     delete[] deal[NUM_PLAYERS];
 }
 
-//void Trainer::shuffle() {
-//    std::shuffle(deck.begin(), deck.end(), rng);
-//    for (int i = 0; i < NUM_HOLE_CARDS; ++i) deal[0][i] = deck[i];
-//    for (int i = 0; i < NUM_STREET_CARDS; ++i) deal[1][i] = deck[i + NUM_HOLE_CARDS];
-//}
-
 void Trainer::shuffle() {
     // TODO: fisher-yates partial shuffle instead
-    std::shuffle(deck, deck + 52, rng);
+    std::shuffle(deck, deck + NUM_CARDS, rng);
     int dealt = 0;
 
     for (int i = 0; i < NUM_PLAYERS; ++i) {
@@ -54,14 +48,15 @@ void Trainer::shuffle() {
 void Trainer::train(const unsigned int iterations) {
     this->iterations = iterations;
 
-    for (unsigned int i = 0; i < iterations; ++i) {
+    for (unsigned int i = 1; i < iterations + 1; ++i) {
         shuffle();
         const int targetPlayer = (i % 2 == 0) ? 0 : 1;
-        std::vector<int> pot(2, 1);
-        bot.mccfr(targetPlayer, i + 1, deal[0], deal[1], pot);
+        int pot[]{ 2, 1 };
+        bot.mccfr(targetPlayer, i, deal, boards, pot);
     }
 }
 
+// DEPRECATE, doesn't work anyway
 void Trainer::display_strats() const {
     std::cout << "Node Strategies:\n";
 
@@ -100,14 +95,15 @@ void Trainer::display_strats() const {
     std::cout << "\n\nThis program was trained for " << iterations << " iterations." << "\n\n";
 }
 
-void Trainer::cont_explore(const std::vector<int>& holeCards, const std::vector<int>& streetCards, std::vector<int> pot, int passedStreets, int sinceChance, int infoset, int numPastActions) {
-    const int curPlayer = (numPastActions % 2 == 0) ? 0 : 1;
+void Trainer::cont_explore(const Card*** const deal, Card*** const boards, int* const pot, int passedStreets, int sinceChance, int infoset, int numPastActions) {
+    const bool isEvenAction = numPastActions % 2 == 0;
+    const int curPlayer = (passedStreets > 0) ? isEvenAction : !isEvenAction;
     const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset & (0b1 << sinceChance * ACTION_LEN) - 1;
     const int lastAction = lastActions & 0b111;
 
     for (int i = 0; i < passedStreets; ++i) {
         infoset <<= CARD_LEN;
-        infoset ^= streetCards[i] + 1;
+        infoset ^= deal[NUM_PLAYERS][i]->id;
     }
 
     std::cout << "POT:  " << pot[curPlayer] + pot[!curPlayer] << "\n";
@@ -115,12 +111,12 @@ void Trainer::cont_explore(const std::vector<int>& holeCards, const std::vector<
     if ((lastActions == 0b011010 || lastActions == 0b001001) && sinceChance > 1) {
         if (passedStreets < NUM_STREETS) {
             infoset <<= CARD_LEN;
-            infoset ^= streetCards[passedStreets] + 1;
+            infoset ^= deal[NUM_PLAYERS][passedStreets]->id;
             sinceChance = 0;
             ++passedStreets;
         }
         else {
-            std::cout << "PLAYER 1 PAYOFF:  " << CFR::terminal_util(curPlayer, pot, holeCards, streetCards, passedStreets) << "\n\n\n";
+            std::cout << "PLAYER 1 PAYOFF:  " << CFR::terminal_util(curPlayer, pot, boards) << "\n\n\n";
             return;
         }
     }
@@ -130,17 +126,24 @@ void Trainer::cont_explore(const std::vector<int>& holeCards, const std::vector<
     }
     ++sinceChance;
 
-    infoset <<= CARD_LEN;
-    infoset ^= holeCards[curPlayer] + 1;
+    for (int i = 0; i < NUM_HOLE_CARDS; ++i) {
+        infoset <<= CARD_LEN;
+        infoset ^= deal[curPlayer][i]->id;
+    }
 
     std::unordered_map<int, std::string> options{ { 0b001, "check" }, { 0b010, "call" }, { 0b011, "raise" }, { 0b100, "fold" } };
-    std::unordered_map<int, std::string> cards{ { 0b001, "Jack" }, { 0b010, "Queen" }, { 0b011, "King" } };
+    std::unordered_map<int, Card> cards;
+    for (int i = 1; i <= SUITS; ++i) {
+        for (int j = 1; j <= RANKS; ++j) {
+            cards[i * j] = Card(j + 1, i - 1);
+        }
+    }
 
     std::cout << "INFOSET:  ";
     int infosetCpy = infoset;
-    for (int i = 0; i < passedStreets + 1; ++i) {
-        std::cout << cards[infosetCpy & 0b11] << " ";
-        infosetCpy >>= 2;
+    for (int i = 0; i < passedStreets + 2; ++i) {
+        std::cout << "(" << cards[infosetCpy & 0b111111].rank  << ", " << cards[infosetCpy & 0b111111].suit << ")" << " ";
+        infosetCpy >>= 6;
     }
     while (infosetCpy) {
         std::cout << options[infosetCpy & 0b111] << " ";
@@ -173,13 +176,13 @@ void Trainer::cont_explore(const std::vector<int>& holeCards, const std::vector<
     std::cout << "\n";
 
     CFR::update_pot(pot, curPlayer, action, lastAction, passedStreets);
-    cont_explore(holeCards, streetCards, pot, passedStreets, sinceChance, infoset ^ action, numPastActions + 1);
+    cont_explore(deal, boards, pot, passedStreets, sinceChance, infoset ^ action, numPastActions + 1);
 }
 
 void Trainer::explore() {
     while (true) {
         shuffle();
-        std::vector<int> pot(2, 1);
-        cont_explore(deal[0], deal[1], pot);
+        int pot[]{ 2, 1 };
+        cont_explore(deal, boards, pot);
     }
 }
