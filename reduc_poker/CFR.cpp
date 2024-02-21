@@ -90,7 +90,7 @@ int CFR::rank_hand(Card** const hand) {
     return rank;
 }
 
-int CFR::terminal_util(const int curPlayer, const int* const pot, Card*** const boards) {
+int CFR::terminal_util(const int curPlayer, const std::vector<int>& pot, Card*** const boards) {
     int bestRank[NUM_PLAYERS]{};
     Card* bestHand[NUM_PLAYERS][HAND_SIZE]{};
     Card* curHand[HAND_SIZE];
@@ -116,7 +116,7 @@ int CFR::terminal_util(const int curPlayer, const int* const pot, Card*** const 
     return (curPlayerBetter == 1) ? pot[!curPlayer] : (curPlayerBetter == 0) ? -pot[curPlayer] : 0;
 }
 
-int CFR::update_pot(int* pot, const int curPlayer, const int action, const int lastAction, const int passedStreets) {
+int CFR::update_pot(std::vector<int>& pot, const int curPlayer, const int action, const int lastAction, const int passedStreets) {
     if (!(action == 0b010 || action == 0b011)) return 0;
 
     int bet = pot[!curPlayer] - pot[curPlayer];
@@ -128,24 +128,40 @@ int CFR::update_pot(int* pot, const int curPlayer, const int action, const int l
     return bet;
 }
 
-double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const Card*** const deal, Card*** const boards, int* const pot, int passedStreets, int sinceChance, int infoset, int numPastActions) {
+double CFR::mccfr(const int targetPlayer, const unsigned int iteration, Card*** const deal, Card*** const boards, std::vector<int> pot, int passedStreets, int sinceChance, unsigned long long infoset, int numPastActions) {
     const bool isEvenAction = numPastActions % 2 == 0;
-    const int curPlayer = (passedStreets > 0) ? isEvenAction : !isEvenAction;
+    const int curPlayer = (passedStreets > 0) ? !isEvenAction : isEvenAction;
     const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset & (0b1 << sinceChance * ACTION_LEN) - 1;
     const int lastAction = lastActions & 0b111;
 
+    // TODO: flop gives three cards
     // add street cards to infoset
-    for (int i = 0; i < passedStreets; ++i) {
-        infoset <<= CARD_LEN;
-        infoset ^= deal[NUM_PLAYERS][i]->id;
+    if (passedStreets) {
+        for (int i = 0; i < 3; ++i) {
+            infoset <<= CARD_LEN;
+            infoset ^= deal[NUM_PLAYERS][i]->id;
+        }
+        for (int i = 0; i < passedStreets - 1; ++i) {
+            infoset <<= CARD_LEN;
+            infoset ^= deal[NUM_PLAYERS][i + 3]->id;
+        }
     }
 
+    // TODO: allow 3 raises per street
     // return payoff if raise-call or check-check, fold (i.e. on terminal nodes)
     if ((lastActions == 0b011010 || lastActions == 0b001001) && sinceChance > 1) {
         // add next street card to infoset
         if (passedStreets < NUM_STREETS) {
-            infoset <<= CARD_LEN;
-            infoset ^= deal[NUM_PLAYERS][passedStreets]->id;
+            if (passedStreets == 0) {
+                for (int i = 0; i < 3; ++i) {
+                    infoset <<= CARD_LEN;
+                    infoset ^= deal[NUM_PLAYERS][passedStreets + i]->id;
+                }
+            }
+            else {
+                infoset <<= CARD_LEN;
+                infoset ^= deal[NUM_PLAYERS][passedStreets]->id;
+            }
             sinceChance = 0;
             ++passedStreets;
         }
@@ -172,7 +188,7 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const Ca
     const double iterWeight = double(iteration) / (iteration + 1000000);
 
     // remove hole cards and street cards; prepare for next action
-    infoset >>= passedStreets * CARD_LEN + CARD_LEN;
+    infoset >>= (passedStreets == 0) ? NUM_HOLE_CARDS * CARD_LEN : (passedStreets + 2 + NUM_HOLE_CARDS) * CARD_LEN;
     infoset <<= ACTION_LEN;
 
     if (curPlayer != targetPlayer) {
@@ -192,6 +208,7 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, const Ca
         const int action = actions[i];
         const int bet = update_pot(pot, curPlayer, action, lastAction, passedStreets);
 
+        // TODO: pot needs to be copied instead of a pointer
         cfUtils[i] = -mccfr(targetPlayer, iteration, deal, boards, pot, passedStreets, sinceChance, infoset ^ action, numPastActions + 1);
         nodeUtil += cfUtils[i] * nodeStrat[i];
         pot[curPlayer] -= bet;

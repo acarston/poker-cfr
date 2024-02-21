@@ -2,11 +2,7 @@
 
 Trainer::Trainer() {
     for (int i = 0; i < SUITS; ++i) {
-        for (int j = 0; j < RANKS; ++j) {
-            const int idx = i * RANKS + j;
-            objDeck[idx].rank = j + 2;
-            objDeck[idx].suit = i;
-        }
+        for (int j = 0; j < RANKS; ++j) objDeck[i * RANKS + j].set(j + 2, i);
     }
     for (int i = 0; i < NUM_CARDS; ++i) deck[i] = &objDeck[i];
 
@@ -51,7 +47,7 @@ void Trainer::train(const unsigned int iterations) {
     for (unsigned int i = 1; i < iterations + 1; ++i) {
         shuffle();
         const int targetPlayer = (i % 2 == 0) ? 0 : 1;
-        int pot[]{ 2, 1 };
+        std::vector<int> pot{ 2, 1 };
         bot.mccfr(targetPlayer, i, deal, boards, pot);
     }
 }
@@ -95,7 +91,7 @@ void Trainer::display_strats() const {
     std::cout << "\n\nThis program was trained for " << iterations << " iterations." << "\n\n";
 }
 
-void Trainer::cont_explore(const Card*** const deal, Card*** const boards, int* const pot, int passedStreets, int sinceChance, int infoset, int numPastActions) {
+void Trainer::cont_explore(Card*** const deal, Card*** const boards, std::vector<int> pot, int passedStreets, int sinceChance, int infoset, int numPastActions) {
     const bool isEvenAction = numPastActions % 2 == 0;
     const int curPlayer = (passedStreets > 0) ? isEvenAction : !isEvenAction;
     const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset & (0b1 << sinceChance * ACTION_LEN) - 1;
@@ -182,7 +178,7 @@ void Trainer::cont_explore(const Card*** const deal, Card*** const boards, int* 
 void Trainer::explore() {
     while (true) {
         shuffle();
-        int pot[]{ 2, 1 };
-        cont_explore(deal, boards, pot);
+        std::vector<int> pot{ 2, 1 };
+        cont_explore((Card***)deal, boards, pot);
     }
 }
