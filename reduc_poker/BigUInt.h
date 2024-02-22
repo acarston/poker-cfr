@@ -75,9 +75,15 @@ public:
 	}
 
 	struct Hash {
-		std::size_t operator()(const BigUInt& other) const noexcept {
-			size_t hash = std::hash<int>()(other.bigUInt[0]);
-			for (size_t i = 1; i < other.size; ++i) hash ^= other.bigUInt[i];
+		std::size_t operator()(const BigUInt& obj) const noexcept {
+			std::size_t hash = 17;
+			const std::size_t prime = 31;
+
+			for (std::size_t i = 0; i < obj.size; ++i) {
+				hash = hash * prime + std::hash<unsigned long long>{}(obj.bigUInt[i]);
+			}
+
+			return hash;
 		}
 	};
 };
