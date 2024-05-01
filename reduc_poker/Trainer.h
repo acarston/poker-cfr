@@ -43,7 +43,7 @@ public:
 
     void train(const unsigned int iterations);
     void display_strats() const;
-    void cont_explore(Card*** const deal, Card*** const boards, std::vector<int> pot, int passedStreets = 0, int sinceChance = 0, int infoset = 0, int numPastActions = 0);
+    void cont_explore(Card*** const deal, Card*** const boards, std::vector<int> pot, int passedStreets = 0, int sinceChance = 0, BigUInt infoset = { 0, 256 }, int numPastActions = 0);
     void explore();
 };
 

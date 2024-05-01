@@ -129,6 +129,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CFR.h" />
+    <ClInclude Include="GTNode.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="Trainer.h" />
   </ItemGroup>

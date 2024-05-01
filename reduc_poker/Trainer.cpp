@@ -91,7 +91,7 @@ void Trainer::display_strats() const {
     std::cout << "\n\nThis program was trained for " << iterations << " iterations." << "\n\n";
 }
 
-void Trainer::cont_explore(Card*** const deal, Card*** const boards, std::vector<int> pot, int passedStreets, int sinceChance, int infoset, int numPastActions) {
+void Trainer::cont_explore(Card*** const deal, Card*** const boards, std::vector<int> pot, int passedStreets, int sinceChance, BigUInt infoset, int numPastActions) {
     const bool isEvenAction = numPastActions % 2 == 0;
     const int curPlayer = (passedStreets > 0) ? isEvenAction : !isEvenAction;
     const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset & (0b1 << sinceChance * ACTION_LEN) - 1;
@@ -136,7 +136,7 @@ void Trainer::cont_explore(Card*** const deal, Card*** const boards, std::vector
     }
 
     std::cout << "INFOSET:  ";
-    int infosetCpy = infoset;
+    BigUInt infosetCpy(infoset);
     for (int i = 0; i < passedStreets + 2; ++i) {
         std::cout << "(" << cards[infosetCpy & 0b111111].rank  << ", " << cards[infosetCpy & 0b111111].suit << ")" << " ";
         infosetCpy >>= 6;

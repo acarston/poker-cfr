@@ -1,4 +1,3 @@
-#include "Trainer.h"
 #include "CFR.h"
 
 CFR::BoardPermutation& CFR::BoardPermutation::operator++() {
@@ -128,7 +127,7 @@ int CFR::update_pot(std::vector<int>& pot, const int curPlayer, const int action
     return bet;
 }
 
-double CFR::mccfr(const int targetPlayer, const unsigned int iteration, Card*** const deal, Card*** const boards, std::vector<int> pot, int passedStreets, int sinceChance, unsigned long long infoset, int numPastActions) {
+double CFR::mccfr(const int targetPlayer, const unsigned int iteration, Card*** const deal, Card*** const boards, std::vector<int> pot, int passedStreets, int sinceChance, BigUInt infoset, int numPastActions) {
     const bool isEvenAction = numPastActions % 2 == 0;
     const int curPlayer = (passedStreets > 0) ? !isEvenAction : isEvenAction;
     const int lastActions = (sinceChance > 1 || passedStreets == 0) ? infoset & 0b111111 : infoset & (0b1 << sinceChance * ACTION_LEN) - 1;
@@ -217,6 +216,8 @@ double CFR::mccfr(const int targetPlayer, const unsigned int iteration, Card*** 
     double* cumulRegrets = node->cumul_regrets();
     for (int i = 0; i < numActions; ++i) cumulRegrets[i] += (cfUtils[i] - nodeUtil) * iterWeight;
     delete[] cfUtils;
+
+    // CALL update_strategy HERE, WHICH ALSO CALLS update_sum!!!
 
     return nodeUtil;
 }

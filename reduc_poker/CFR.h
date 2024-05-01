@@ -10,6 +10,7 @@
 
 #include "Node.h"
 #include "Card.h"
+#include "BigUInt.h"
 
 class CFR {
 private:
@@ -42,7 +43,7 @@ private:
 	};
 
 public:
-	std::unordered_map<int, Node*> nodes;
+	std::unordered_map<BigUInt, Node*, BigUInt::Hash> nodes;
 	
 	static void clear_queue(std::queue<Card*>& q);
 	static int compare_hands(Card** hand1, Card** hand2);
@@ -50,7 +51,7 @@ public:
 	static int terminal_util(const int curPlayer, const std::vector<int>& pot, Card*** const boards);
 	static int update_pot(std::vector<int>& pot, const int curPlayer, const int action, const int lastAction, const int passedStreets);
 
-	double mccfr(const int targetPlayer, const unsigned int iteration, Card*** const deal, Card*** const boards, std::vector<int> pot, int passedStreets = 0, int sinceChance = 0, unsigned long long infoset = 0, int numPastActions = 0);
+	double mccfr(const int targetPlayer, const unsigned int iteration, Card*** const deal, Card*** const boards, std::vector<int> pot, int passedStreets = 0, int sinceChance = 0, BigUInt infoset = { 0, 256 }, int numPastActions = 0);
 };
 
 #endif

@@ -17,28 +17,14 @@ public:
 		this->size = size / ULLONG_BITSIZE;
 		bigUInt = new unsigned long long[this->size];
 		bigUInt[0] = uInt;
-		std::fill(bigUInt + 1, bigUInt + this->size, 0);
 	}
-	//~BigUInt() { if (bigUInt != nullptr) delete[] bigUInt; }
+	~BigUInt() { delete[] bigUInt; }
 
 	bool operator==(const BigUInt& other) const {
 		for (std::size_t i = 0; i < size; ++i) {
 			if (this->bigUInt[i] != other.bigUInt[i]) return false;
 		}
 		return true;
-	}
-
-	explicit operator bool() const {
-		for (std::size_t i = 0; i < size; ++i) {
-			if (!this->bigUInt[i]) return true;
-		}
-		return false;
-	}
-
-	BigUInt operator^(const unsigned int x) const {
-		BigUInt copy(*this);
-		copy ^= x;
-		return copy;
 	}
 
 	BigUInt& operator^=(const unsigned int x) {
@@ -67,29 +53,22 @@ public:
 	}
 
 	BigUInt& operator<<=(const unsigned int x) {
-		bool done = false;
-		for (std::size_t i = 0; i < size; ++i) {
-			unsigned long long mask = bigUInt[i] >> ULLONG_BITSIZE - x;
+		unsigned long long remaining = bigUInt[0] >> ULLONG_BITSIZE - x;
 
-			if (!mask && !bigUInt[i]) continue;
-			else done = true;
+		bigUInt[0] -= remaining << ULLONG_BITSIZE - x;
+		bigUInt[0] <<= x;
 
-			bigUInt[i] -= mask << ULLONG_BITSIZE - x;
-			bigUInt[i] <<= x; 
+		const int mask = int(pow(2, x)) - 1;
+		for (std::size_t i = 1; i < size; ++i) {
+			if (!remaining) return *this;
 
-			for (std::size_t j = i + 1; j < size; ++j) {
-				if (!mask) break;
+			const unsigned long long nextRemaining = bigUInt[i] >> ULLONG_BITSIZE - x;
 
-				const unsigned long long nextMask = bigUInt[j] >> ULLONG_BITSIZE - x;
+			bigUInt[i] -= nextRemaining << ULLONG_BITSIZE - x;
+			bigUInt[i] <<= x;
+			bigUInt[i] &= remaining;
 
-				bigUInt[j] -= nextMask << ULLONG_BITSIZE - x;
-				bigUInt[j] <<= x;
-				bigUInt[j] ^= mask;
-
-				mask = nextMask;
-			}
-
-			if (done) return *this;
+			remaining = nextRemaining;
 		}
 
 		return *this;

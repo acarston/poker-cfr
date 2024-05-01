@@ -18,6 +18,7 @@ private:
 
 public:
 	Node(const int lastActions, const int lastAction, const int passedStreets);
+	Node() {};
 	~Node();
 
 	int passed_streets() const { return this->passedStreets; }
